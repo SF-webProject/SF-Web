@@ -12,21 +12,36 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Check project files
+        id: check
+        run: |
+          if [ -f package.json ]; then
+            echo "has_package=true" >> $GITHUB_OUTPUT
+          else
+            echo "has_package=false" >> $GITHUB_OUTPUT
+            echo "No package.json. Skipping install/lint/build."
+          fi
+
       - name: Setup Node
+	if: steps.check.outputs.has_package == 'true'
         uses: actions/setup-node@v4
         with:
           node-version: 20
 
       - name: Enable Corepack (pnpm)
+	if: steps.check.outputs.has_package == 'true'
         run: |
           corepack enable
           corepack prepare pnpm@latest --activate
 
       - name: Install
+	if: steps.check.outputs.has_package == 'true'
         run: pnpm install --frozen-lockfile
 
       - name: Lint
+	if: steps.check.outputs.has_package == 'true'
         run: pnpm lint
 
       - name: Build
+	if: steps.check.outputs.has_package == 'true'
         run: pnpm build
