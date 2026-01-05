@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Join Us | Security Fact</title>
+    <style>
+        :root {
+            --bg-color: #000;
+            --accent-red: #ff3131;
+            --card-bg: #111;
+            --input-bg: #1a1a1a;
+            --border-color: #333;
+            --text-gray: #888;
+        }
+
+        body { 
+            background: var(--bg-color); 
+            color: #fff; 
+            font-family: 'Segoe UI', Roboto, 'Apple SD Gothic Neo', sans-serif; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            min-height: 100vh; 
+            margin: 0; 
+        }
+
+        .signup-container { 
+            background: var(--card-bg); 
+            padding: 50px 40px; 
+            border-radius: 15px; 
+            width: 100%;
+            max-width: 400px; 
+            border: 1px solid #222;
+            box-sizing: border-box;
+        }
+
+        .accent { 
+            color: var(--accent-red); 
+            text-align: center; 
+            margin-bottom: 40px; 
+            letter-spacing: 4px;
+            font-size: 2rem;
+            margin-top: 0;
+        }
+
+        .input-group { margin-bottom: 20px; }
+        .input-group label { 
+            display: block; 
+            font-size: 0.75rem; 
+            color: var(--text-gray); 
+            margin-bottom: 8px; 
+            font-weight: bold;
+            letter-spacing: 1px;
+        }
+
+        input { 
+            background: var(--input-bg); 
+            border: 1px solid var(--border-color); 
+            color: #fff; 
+            padding: 14px; 
+            width: 100%; 
+            border-radius: 6px; 
+            box-sizing: border-box; 
+            outline: none; 
+            transition: 0.3s;
+        }
+
+        input:focus { 
+            border-color: var(--accent-red); 
+            box-shadow: 0 0 8px rgba(255, 49, 49, 0.2);
+        }
+
+        button { 
+            background: var(--accent-red); 
+            color: #fff; 
+            border: none; 
+            padding: 16px; 
+            width: 100%; 
+            border-radius: 6px; 
+            font-weight: bold; 
+            font-size: 1rem;
+            cursor: pointer; 
+            margin-top: 25px; 
+            transition: 0.3s;
+        }
+
+        button:hover { 
+            background: #d62828;
+            transform: translateY(-1px);
+        }
+
+        .notice { 
+            font-size: 0.8rem; 
+            color: #555; 
+            margin-top: 20px; 
+            text-align: center; 
+            line-height: 1.5;
+        }
+
+        /* 하단 링크 (로그인으로 돌아가기 등) */
+        .footer-link {
+            text-align: center;
+            margin-top: 25px;
+            font-size: 0.85rem;
+            color: var(--text-gray);
+        }
+        .footer-link a {
+            color: var(--accent-red);
+            text-decoration: none;
+            margin-left: 5px;
+        }
+        .footer-link a:hover { text-decoration: underline; }
+    </style>
+</head>
+<body>
+
+    <div class="signup-container">
+        <h1 class="accent">JOIN US</h1>
+        
+        <form>
+            <div class="input-group">
+                <label>NAME</label>
+                <input type="text" placeholder="성명을 입력하세요" required>
+            </div>
+
+            <div class="input-group">
+                <label>ID</label>
+                <input type="text" placeholder="사용할 아이디" required>
+            </div>
+
+            <div class="input-group">
+                <label>EMAIL</label>
+                <input type="email" placeholder="example@security.com" required>
+            </div>
+
+            <div class="input-group">
+                <label>PASSWORD</label>
+                <input type="password" placeholder="8자 이상 입력" required>
+            </div>
+
+            <button type="submit">CREATE ACCOUNT</button>
+        </form>
+
+        <p class="notice">가입 신청 후 관리자의 승인을 거쳐<br>정식 회원으로 활동이 가능합니다.</p>
+
+        <div class="footer-link">
+            이미 계정이 있으신가요? <a href="login.html">로그인</a>
+        </div>
+    </div>
+
+</body>
+</html>

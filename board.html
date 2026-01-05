@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>Board | Security Fact</title>
+    <style>
+        :root {
+            --primary-color: #ff3131;
+            --bg-black: #0d0d0d;
+            --card-bg: #1a1a1a;
+            --text-gray: #aaa;
+        }
+
+        body { background: var(--bg-black); color: #fff; font-family: 'Pretendard', sans-serif; padding: 50px 10%; line-height: 1.6; }
+        .accent { color: var(--primary-color); font-size: 2.5rem; letter-spacing: 2px; }
+        
+        /* 섹션 타이틀 */
+        .section-header { border-bottom: 2px solid var(--primary-color); margin-bottom: 30px; padding-bottom: 10px; display: flex; justify-content: space-between; align-items: flex-end; }
+        .section-header h2 { margin: 0; font-size: 1.5rem; }
+
+        /* 그리드 레이아웃 (KUCC/YAPP 스타일) */
+        .project-grid { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); 
+            gap: 25px; 
+            margin-top: 20px; 
+        }
+
+        /* 카드 스타일 */
+        .item-card { 
+            background: var(--card-bg); 
+            border-radius: 12px; 
+            overflow: hidden; 
+            transition: transform 0.3s ease, border 0.3s ease;
+            border: 1px solid #333;
+            cursor: pointer;
+        }
+
+        .item-card:hover { 
+            transform: translateY(-10px); 
+            border-color: var(--primary-color); 
+        }
+
+        /* 카드 이미지 영역 */
+        .card-image {
+            width: 100%;
+            height: 180px;
+            background: #252525;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #444;
+            font-weight: bold;
+        }
+
+        /* 카드 텍스트 영역 */
+        .card-content { padding: 20px; }
+        .card-tag { color: var(--primary-color); font-size: 0.8rem; font-weight: bold; margin-bottom: 8px; display: block; }
+        .card-title { font-size: 1.1rem; font-weight: 600; margin-bottom: 10px; display: block; }
+        .card-author { color: var(--text-gray); font-size: 0.9rem; }
+
+        /* 기존 테이블 스타일 유지 */
+        .board-table { width: 100%; border-collapse: collapse; margin-top: 50px; }
+        .board-table th, .board-table td { border-bottom: 1px solid #222; padding: 15px; text-align: left; }
+        .board-table th { color: var(--primary-color); text-transform: uppercase; font-size: 0.9rem; }
+        
+        .comment-box { margin-top: 60px; padding: 30px; background: #111; border-radius: 10px; }
+        input { background: #222; border: 1px solid #333; color: #fff; padding: 12px; width: 80%; border-radius: 5px; }
+        button { background: var(--primary-color); color: #fff; border: none; padding: 12px 25px; cursor: pointer; border-radius: 5px; font-weight: bold; }
+    </style>
+</head>
+<body>
+        
+    <h1 class="accent">BOARD</h1>
+
+    <div class="notice-section">
+        <div class="section-header">
+            <h2>📢 25-2 Project List</h2>
+            <span style="color: var(--text-gray); font-size: 0.8rem;">총 6개의 프로젝트</span>
+        </div>
+        
+        <div class="project-grid">
+            <div class="item-card">
+                <div class="card-image">IMAGE</div>
+                <div class="card-content">
+                    <span class="card-tag">WEB / DEV</span>
+                    <span class="card-title">동아리 웹사이트 제작</span>
+                    <span class="card-author">PM. 노민영</span>
+                </div>
+            </div>
+
+            <div class="item-card">
+                <div class="card-image">IMAGE</div>
+                <div class="card-content">
+                    <span class="card-tag">REVERSING</span>
+                    <span class="card-title">앱 리버싱·분석</span>
+                    <span class="card-author">PM. 김휘성</span>
+                </div>
+            </div>
+
+            <div class="item-card">
+                <div class="card-image">IMAGE</div>
+                <div class="card-content">
+                    <span class="card-tag">SYSTEM</span>
+                    <span class="card-title">Arm TrustZone 격리</span>
+                    <span class="card-author">PM. 안동기</span>
+                </div>
+            </div>
+
+            <div class="item-card">
+                <div class="card-image">IMAGE</div>
+                <div class="card-content">
+                    <span class="card-tag">AI / SECURITY</span>
+                    <span class="card-title">Deepfake Defense</span>
+                    <span class="card-author">PM. 김가겸</span>
+                </div>
+            </div>
+
+            <div class="item-card">
+                <div class="card-image">IMAGE</div>
+                <div class="card-content">
+                    <span class="card-tag">Honeypot</span>
+                    <span class="card-title">허니팟(Honeypot) 구축 및 공격 트래픽 분석</span>
+                    <span class="card-author">PM. 이운희</span>
+                </div>
+            </div>
+
+            <div class="item-card">
+                <div class="card-image">IMAGE</div>
+                <div class="card-content">
+                    <span class="card-tag">Embedded</span>
+                    <span class="card-title">임베디드 기기 펌웨어 분석 및 취약점 분석</span>
+                    <span class="card-author">PM. 김여진</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div style="text-align: center; margin-top: 50px;">
+    <button style="background: none; border: 1px solid #444; color: #aaa; padding: 15px 40px; border-radius: 30px; transition: 0.3s;">
+        LOAD MORE PROJECTS
+    </button>
+    </div>
+
+</body>
+</html>

@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Recruit | Security Fact</title>
+
+  <style>
+    :root{
+      /* Base */
+      --bg: #0b0f14;
+      --surface: #0f1623;
+      --surface-2: #0c121c;
+      --text: #e6edf6;
+      --muted: #9aa4b2;
+      --border: rgba(255,255,255,.10);
+
+      /* Accents (Teal primary + Red secondary) */
+      --accent: #2dd4bf;            /* teal */
+      --accent-2: #60a5fa;          /* soft blue */
+      --accent-red: #ff5a5f;        /* softer red than pure neon */
+      --accent-glow: rgba(45,212,191,.18);
+      --red-glow: rgba(255,90,95,.12);
+    }
+
+    *{ box-sizing: border-box; }
+    body{
+      background:
+        radial-gradient(1200px 600px at 50% -10%, rgba(96,165,250,.10), transparent 60%),
+        radial-gradient(900px 500px at 10% 20%, rgba(45,212,191,.10), transparent 55%),
+        radial-gradient(900px 500px at 90% 25%, rgba(255,90,95,.06), transparent 55%),
+        var(--bg);
+      color: var(--text);
+      font-family: 'Segoe UI', Roboto, 'Apple SD Gothic Neo', sans-serif;
+      margin: 0;
+      line-height: 1.65;
+    }
+
+    /* Header */
+    header{
+      background: rgba(11,15,20,.78);
+      backdrop-filter: blur(10px);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 14px 5%;
+      position: fixed;
+      width: 100%;
+      top: 0;
+      z-index: 1000;
+      border-bottom: 1px solid rgba(255,255,255,.08);
+    }
+    /* 얇은 그라데이션 라인(Teal -> Red) */
+    header::after{
+      content:"";
+      position:absolute;
+      left:0; right:0; bottom:-1px;
+      height: 2px;
+      background: linear-gradient(90deg, rgba(45,212,191,.9), rgba(96,165,250,.7), rgba(255,90,95,.85));
+      opacity: .9;
+    }
+
+    .logo{
+      font-weight: 900;
+      font-size: 1.45rem;
+      letter-spacing: .8px;
+      color: var(--text);
+      text-decoration: none;
+      position: relative;
+    }
+    .logo .fact{ color: var(--accent); }
+    .logo .dot{
+      display:inline-block;
+      width: 8px; height: 8px;
+      border-radius: 999px;
+      background: var(--accent-red);
+      margin-left: 6px;
+      transform: translateY(-2px);
+      box-shadow: 0 0 0 6px var(--red-glow);
+    }
+
+    /* Container */
+    .container{
+      padding: 120px 10% 80px;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    .main-title{
+      text-align: center;
+      margin-bottom: 56px;
+    }
+    /* 타이틀을 Teal -> Red로 변경(빨강 "조금") */
+    .main-title h1{
+      margin: 0;
+      font-size: 3.1rem;
+      letter-spacing: 2px;
+      background: linear-gradient(90deg, var(--accent), rgba(96,165,250,.95), var(--accent-red));
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+    .main-title p{
+      margin-top: 10px;
+      font-size: 1.05rem;
+      color: var(--muted);
+    }
+
+    /* Sections */
+    .section{ margin-bottom: 46px; }
+
+    .section-title{
+      font-size: 1.25rem;
+      font-weight: 900;
+      color: var(--text);
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    /* 점을 Teal + 아주 미세한 Red 링으로 */
+    .section-title::before{
+      content:"";
+      width: 10px;
+      height: 10px;
+      border-radius: 999px;
+      background: var(--accent);
+      box-shadow:
+        0 0 0 6px rgba(45,212,191,.12),
+        0 0 0 10px rgba(255,90,95,.06);
+    }
+
+    .content-box{
+      background: linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.015));
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 30px;
+      box-shadow: 0 10px 30px rgba(0,0,0,.35);
+    }
+
+    /* Lists */
+    .info-list{
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+    .info-list li{
+      position: relative;
+      padding-left: 26px;
+      margin-bottom: 12px;
+      font-size: 1.02rem;
+      color: rgba(230,237,246,.86);
+    }
+    .info-list li::before{
+      content: "";
+      position: absolute;
+      left: 0;
+      top: .55em;
+      width: 10px;
+      height: 10px;
+      border-radius: 3px;
+      /* bullet도 Teal+Red를 아주 약하게 */
+      background: linear-gradient(180deg, rgba(45,212,191,.8), rgba(255,90,95,.55));
+      box-shadow: 0 0 0 4px rgba(45,212,191,.08);
+      transform: translateY(-50%);
+    }
+    .highlight{
+      color: var(--accent);
+      font-weight: 900;
+    }
+
+    /* Tech grid */
+    .tech-grid{
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 12px;
+    }
+    .tech-tag{
+      background: rgba(15,22,35,.8);
+      border: 1px solid rgba(255,255,255,.10);
+      border-radius: 12px;
+      padding: 14px 12px;
+      text-align: center;
+      font-weight: 900;
+      color: rgba(230,237,246,.92);
+      transition: transform .18s ease, border-color .18s ease, box-shadow .18s ease;
+    }
+    /* Hover 시 Teal, Focus 느낌으로 Red를 아주 살짝 */
+    .tech-tag:hover{
+      transform: translateY(-2px);
+      border-color: rgba(45,212,191,.55);
+      box-shadow:
+        0 0 0 6px rgba(45,212,191,.10),
+        0 0 0 10px rgba(255,90,95,.06);
+    }
+
+    /* Contact */
+    .contact-wrapper{
+      display: flex;
+      justify-content: space-between;
+      align-items: stretch;
+      flex-wrap: wrap;
+      gap: 18px;
+    }
+    .contact-card{
+      flex: 1;
+      min-width: 280px;
+      background: rgba(12,18,28,.75);
+      border: 1px solid rgba(255,255,255,.10);
+      border-radius: 14px;
+      padding: 22px;
+      position: relative;
+      overflow: hidden;
+    }
+    /* 카드 상단 아주 얇은 라인으로 Red 포인트 */
+    .contact-card::before{
+      content:"";
+      position:absolute;
+      left:0; right:0; top:0;
+      height: 2px;
+      background: linear-gradient(90deg, rgba(45,212,191,.7), rgba(255,90,95,.85));
+      opacity: .55;
+    }
+    .contact-card h4{
+      margin: 0 0 10px;
+      color: var(--muted);
+      font-size: .78rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+    .contact-card b{ color: var(--text); }
+    .contact-card .accent{
+      color: var(--accent);
+      font-weight: 900;
+      font-size: 1.2rem;
+      margin-top: 6px;
+    }
+
+    /* Apply button (Teal -> Red) */
+    .apply-area{
+      text-align: center;
+      margin-top: 70px;
+      padding-top: 44px;
+      border-top: 1px solid rgba(255,255,255,.08);
+    }
+    .apply-btn{
+      display: inline-block;
+      text-decoration: none;
+      padding: 16px 46px;
+      font-weight: 1000;
+      font-size: 1.2rem;
+      color: #081018;
+      border-radius: 999px;
+      background: linear-gradient(90deg, rgba(45,212,191,.95), rgba(96,165,250,.85), rgba(255,90,95,.92));
+      box-shadow:
+        0 12px 30px rgba(0,0,0,.35),
+        0 0 0 6px rgba(45,212,191,.10),
+        0 0 0 12px rgba(255,90,95,.06);
+      transition: transform .18s ease, filter .18s ease;
+    }
+    .apply-btn:hover{
+      transform: translateY(-2px);
+      filter: brightness(1.03);
+    }
+
+    /* FAQ */
+    .faq-container{
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      max-width: 850px;
+      margin: 0 auto;
+      text-align: left;
+    }
+    .faq-item{
+      background: rgba(15,22,35,.70);
+      border: 1px solid rgba(255,255,255,.10);
+      border-radius: 14px;
+      overflow: hidden;
+      transition: border-color .18s ease, box-shadow .18s ease;
+    }
+    /* open 시 Teal border + Red glow를 살짝 */
+    .faq-item[open]{
+      border-color: rgba(45,212,191,.55);
+      box-shadow:
+        0 0 0 6px rgba(45,212,191,.10),
+        0 0 0 12px rgba(255,90,95,.05);
+    }
+    .faq-item summary{
+      padding: 18px 22px 18px 52px;
+      font-size: 1.05rem;
+      font-weight: 1000;
+      color: rgba(230,237,246,.95);
+      cursor: pointer;
+      list-style: none;
+      position: relative;
+      background: rgba(255,255,255,.02);
+    }
+    .faq-item summary:hover{
+      background: rgba(255,255,255,.04);
+    }
+    /* Q 아이콘을 Teal 바탕 + Red 테두리 느낌 */
+    .faq-item summary::before{
+      content: "Q";
+      position: absolute;
+      left: 18px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 22px;
+      height: 22px;
+      border-radius: 8px;
+      display: grid;
+      place-items: center;
+      font-weight: 1000;
+      color: #041016;
+      background: rgba(45,212,191,.92);
+      box-shadow:
+        0 0 0 6px rgba(45,212,191,.10),
+        0 0 0 10px rgba(255,90,95,.06);
+      border: 1px solid rgba(255,90,95,.20);
+    }
+    .faq-answer{
+      padding: 0 22px 18px 52px;
+      color: rgba(230,237,246,.78);
+      font-size: .95rem;
+      line-height: 1.75;
+      border-top: 1px solid rgba(255,255,255,.08);
+      padding-top: 16px;
+      background: rgba(12,18,28,.55);
+    }
+    .faq-item summary::-webkit-details-marker{ display: none; }
+
+    @media (max-width: 768px){
+      .main-title h1{ font-size: 2.35rem; }
+      .container{ padding: 100px 5% 70px; }
+      .content-box{ padding: 20px; }
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <a href="index.html" class="logo">Security<span class="fact">FACT</span><span class="dot"></span></a>
+  </header>
+
+  <div class="container">
+    <div class="main-title">
+      <h1>RECRUIT</h1>
+      <p>미래의 보안 전문가가 될 여러분을 기다립니다</p>
+    </div>
+
+    <div class="section">
+      <div class="section-title">모집 요강</div>
+      <div class="content-box">
+        <ul class="info-list">
+          <li><span class="highlight">모집 일정:</span> 2026.00.00 (화) ~ 2026.00.00 (금) 23:59까지</li>
+          <li><span class="highlight">지원 자격:</span> 건국대학교 공과대학 &amp; 자유전공학부 학생 누구나</li>
+          <li><span class="highlight">지원 방법:</span> 상단의 QR 코드를 통해 지원서 작성 후 제출</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">SecurityFACT에서 다루는 기술</div>
+      <div class="content-box">
+        <div class="tech-grid">
+          <div class="tech-tag">Pwnable</div>
+          <div class="tech-tag">Web Hacking</div>
+          <div class="tech-tag">Reversing</div>
+          <div class="tech-tag">Digital Forensic</div>
+          <div class="tech-tag">BlockChain Security</div>
+          <div class="tech-tag">CS</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">유의사항을 꼭! 확인해주세요</div>
+      <div class="content-box">
+        <ul class="info-list">
+          <li>1년 활동 필수</li>
+          <li>최종합격 이후에도, OT 불참 시 퇴출</li>
+          <li>지원서 주의사항 필독</li>
+          <li>서류합격 이후 대면 면접진행, 일정 조정 필요</li>
+          <li><span class="highlight">디자인</span>을 다룰 수 있으면 가산점! (After Effect, Illustrator)</li>
+          <li>교육 및 세미나를 3회 이상 불참 시 퇴출 조치 (사유서 및 증빙자료 제출 필수)</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">문의사항은 여기로 주세요!</div>
+      <div class="contact-wrapper">
+        <div class="contact-card">
+          <h4>1. Phone Number</h4>
+          <p style="margin:0; font-size: 1.1rem;"><b>회장 노민영</b></p>
+          <p class="accent" style="margin:6px 0 0;">010-0000-0000</p>
+        </div>
+        <div class="contact-card">
+          <h4>2. Instagram DM</h4>
+          <p style="margin:0; font-size: 1.05rem;"><b>@KU_SECURITY.FACT</b></p>
+          <p style="margin:6px 0 0; color: var(--muted);">인스타그램 메시지를 통해 문의</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="apply-area">
+      <a href="recruit_apply.html" class="apply-btn">지금 지원하기</a>
+    </div>
+
+    <div class="section" style="margin-top: 60px;">
+      <div class="section-title">자주 묻는 질문 (FAQ)</div>
+      <div class="content-box">
+        <div class="faq-container">
+          <details class="faq-item">
+            <summary>보안 지식이 전혀 없어도 지원 가능한가요?</summary>
+            <div class="faq-answer">
+              네, 열정만 있다면 가능합니다! SecurityFACT는 신입 부원을 위한 기초 스터디와 커리큘럼을 운영하고 있어,
+              기초부터 차근차근 배우며 성장할 수 있습니다.
+            </div>
+          </details>
+
+          <details class="faq-item">
+            <summary>면접은 어떤 방식으로 진행되나요?</summary>
+            <div class="faq-answer">
+              서류 합격자에 한해 대면 면접이 진행됩니다. 기술적인 질문보다는 동아리 활동에 대한 의지, 협업 능력,
+              그리고 정보보안에 대한 관심을 위주로 편안한 분위기에서 진행될 예정입니다.
+            </div>
+          </details>
+
+          <details class="faq-item">
+            <summary>학기 중에 활동 시간은 어떻게 되나요?</summary>
+            <div class="faq-answer">
+              정기 세미나와 부서별 스터디는 부원들의 시간표를 취합하여 가장 가능한 시간에 진행됩니다.
+              유의사항에 명시된 대로 정기 활동 불참 시 퇴출 조치가 있을 수 있으니 일정을 잘 확인해 주세요.
+            </div>
+          </details>
+
+          <details class="faq-item">
+            <summary>디자인 가산점은 구체적으로 어떤 건가요?</summary>
+            <div class="faq-answer">
+              동아리 홍보물 제작, 웹사이트 UI 개선, 발표 자료 시각화 등에 도움을 주실 수 있는 분을 찾고 있습니다.
+              After Effect나 Illustrator 활용 능력이 있다면 가산점이 부여됩니다.
+            </div>
+          </details>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+    <footer class="footer">
+    &copy; 2025 Security Fact. All Rights Reserved. <br />
+    Konkuk University College of Engineering
+  </footer>
+
+</body>
+</html>

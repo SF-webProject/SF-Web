@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>about_org | Security Fact</title>
+    <style>
+        :root { 
+            --bg-color: #000; 
+            --accent-red: #ff3131; 
+            --text-main: #fff; 
+            --card-bg: #1a1a1a; 
+            --line-color: #444;
+        }
+
+        body { 
+            background: var(--bg-color); 
+            color: var(--text-main); 
+            font-family: 'Pretendard', -apple-system, sans-serif; 
+            margin: 0;
+            padding: 0;
+        }
+
+        .container { padding: 100px 5%; text-align: center; }
+        
+        h1 { font-size: 2.5rem; margin-bottom: 10px; letter-spacing: -1px; }
+        h2 { font-weight: 300; color: #888; margin-bottom: 80px; font-size: 1.1rem; }
+
+        /* 조직도 트리 구조 CSS */
+        .org-chart {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 40px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .level {
+            display: flex;
+            justify-content: center;
+            gap: 25px;
+            width: 100%;
+            flex-wrap: wrap;
+        }
+
+        /* 카드 스타일 */
+        .node {
+            background: var(--card-bg);
+            border: 1px solid var(--line-color);
+            border-top: 4px solid var(--accent-red);
+            padding: 30px 20px;
+            min-width: 200px;
+            border-radius: 4px;
+            transition: all 0.3s ease;
+        }
+
+        .node:hover {
+            transform: translateY(-8px);
+            border-color: var(--accent-red);
+            box-shadow: 0 10px 20px rgba(255, 49, 49, 0.1);
+        }
+
+        .node .role {
+            font-size: 0.8rem;
+            color: var(--accent-red);
+            font-weight: bold;
+            display: block;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .node .name {
+            font-size: 1.3rem;
+            font-weight: 600;
+        }
+
+        .node .desc {
+            font-size: 0.9rem;
+            color: #777;
+            margin-top: 15px;
+            line-height: 1.5;
+            word-break: keep-all;
+        }
+
+        /* 중앙 연결선 */
+        .connector {
+            width: 2px;
+            height: 50px;
+            background: linear-gradient(to bottom, var(--accent-red), var(--line-color));
+        }
+
+        /* 하단 강조 문구 */
+        .vision-footer {
+            margin-top: 100px;
+            padding: 60px 20px;
+            border-top: 1px solid #222;
+        }
+
+        .highlight { 
+            color: var(--accent-red); 
+            font-weight: bold; 
+            font-size: 1.4rem; 
+            line-height: 1.8; 
+            letter-spacing: -0.5px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>조직도</h1>
+        <h2>Security Fact의 체계적인 운영 시스템을 소개합니다</h2>
+
+        <div class="org-chart">
+            <div class="level">
+                <div class="node">
+                    <span class="role">President</span>
+                    <span class="name">회장단</span>
+                    <p class="desc">운영 정책 수립 및<br>조직 전체 관리 총괄</p>
+                </div>
+            </div>
+
+            <div class="connector"></div>
+
+            <div class="level">
+                <div class="node">
+                    <span class="role"> Team</span>
+                    <span class="name">해킹팀</span>
+                    <p class="desc">웹/시스템 취약점 분석 및<br>공격 시나리오 연구</p>
+                </div>
+                <div class="node">
+                    <span class="role"> Team</span>
+                    <span class="name">홍보부</span>
+                    <p class="desc">인스타 홍보 게시물 작성 ,<br>동아리 홍보</p>
+                </div>
+                <div class="node">
+                    <span class="role"> Team</span>
+                    <span class="name">기획부</span>
+                    <p class="desc">동아리내 해킹 대회 주최<br>동아리 친목 도모</p>
+                </div>
+                <div class="node">
+                    <span class="role"> Team</span>
+                    <span class="name">총무</span>
+                    <p class="desc">회비 관리 및<br>지출 내역 기록</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="vision-footer">
+            <p class="highlight">
+                각 분야의 전문성을 바탕으로 끊임없이 정진하여<br>
+                미래의 보안 전문가로 성장합니다.
+            </p>
+        </div>
+    </div>
+
+</body>
+</html>

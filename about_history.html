@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>History | Security Fact</title>
+    <style>
+        :root {
+            --bg-color: #000;
+            --accent-red: #ff3131;
+            --text-main: #fff;
+            --card-bg: #111;
+        }
+        body { background: var(--bg-color); color: var(--text-main); font-family: sans-serif; }
+        .container { padding: 100px 10%; max-width: 900px; margin: 0 auto; }
+        
+        /* 타임라인 디자인 */
+        .timeline {
+            border-left: 2px solid var(--accent-red);
+            padding-left: 30px;
+            position: relative;
+            margin-top: 50px;
+        }
+        .timeline-item {
+            margin-bottom: 50px;
+            position: relative;
+        }
+        .timeline-item::before {
+            content: "";
+            position: absolute;
+            left: -37px;
+            top: 5px;
+            width: 12px;
+            height: 12px;
+            background: var(--accent-red);
+            border-radius: 50%;
+        }
+        .year {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--accent-red);
+            margin-bottom: 10px;
+        }
+        .history-content {
+            background: var(--card-bg);
+            padding: 20px;
+            border-radius: 4px;
+            border: 1px solid #222;
+        }
+        .history-content li {
+            margin-bottom: 8px;
+            list-style: none;
+            color: #ccc;
+        }
+        .history-content li b { color: #fff; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>연혁</h1>
+        <p>SecurityFACT가 걸어온 보안 전문가로의 발자취입니다.</p>
+
+        <div class="timeline">
+            <div class="timeline-item">
+                <div class="year">2025</div>
+                <div class="history-content">
+                    <li><b>Midnight Flag CTF 2025</b> 본선 진출</li>
+                    <li><b>2025 핵테온 세종</b> 국제 대학생 사이버보안 경진대회 본선 진출</li>
+                </div>
+            </div>
+
+            <div class="timeline-item">
+                <div class="year">2024</div>
+                <div class="history-content">
+                    <li><b>사이버공격방어대회(CCE)</b> 준우승</li>
+                    <li><b>금융보안 위협분석 대회 FIESTA</b> 3위</li>
+                    <li><b>Digital Forensic Challenge</b> 학생부 3위</li>
+                    <li><b>화이트햇 콘테스트</b> 우수상</li>
+                </div>
+            </div>
+
+            <div class="timeline-item">
+                <div class="year">2010</div>
+                <div class="history-content">
+                    <li><b>SecurityFACT 설립</b> (건국대학교 공과대학)</li>
+                    <li>정보보안 기술 연구 및 학술 동아리 활동 시작</li>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>Login | Security Fact</title>
+    <style>
+        body { background: #000; color: #fff; font-family: 'Pretendard', sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+        .login-container { background: #111; padding: 40px; border-radius: 15px; width: 350px; border: 1px solid #222; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        .accent { color: #ff3131; text-align: center; margin-bottom: 30px; letter-spacing: 2px; }
+        .input-group { margin-bottom: 20px; }
+        .input-group label { display: block; font-size: 0.8rem; color: #888; margin-bottom: 5px; }
+        input { background: #1a1a1a; border: 1px solid #333; color: #fff; padding: 12px; width: 100%; border-radius: 5px; box-sizing: border-box; outline: none; transition: 0.3s; }
+        input:focus { border-color: #ff3131; }
+        button { background: #ff3131; color: #fff; border: none; padding: 12px; width: 100%; border-radius: 5px; font-weight: bold; cursor: pointer; margin-top: 10px; transition: 0.3s; }
+        button:hover { background: #d62828; }
+        .footer-links { text-align: center; margin-top: 20px; font-size: 0.85rem; color: #666; }
+        .footer-links a { color: #888; text-decoration: none; margin: 0 10px; }
+        .footer-links a:hover { color: #ff3131; }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <h1 class="accent">LOGIN</h1>
+        <div class="input-group">
+            <label>ID / EMAIL</label>
+            <input type="text" placeholder="아이디를 입력하세요">
+        </div>
+        <div class="input-group">
+            <label>PASSWORD</label>
+            <input type="password" placeholder="비밀번호를 입력하세요">
+        </div>
+        <button>SIGN IN</button>
+        <div class="footer-links">
+            <a href="signup.html">회원가입</a> | <a href="#">비밀번호 찾기</a>
+        </div>
+    </div>
+</body>
+</html>
