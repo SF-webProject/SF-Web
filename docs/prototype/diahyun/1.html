@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Security Fact | Information Security Club</title>
+
+  <style>
+    :root{
+      --bg: #0b0f14;
+      --surface: #0f1623;
+      --surface-2: #0c121c;
+      --text: #e6edf6;
+      --muted: #9aa4b2;
+      --border: rgba(255,255,255,.10);
+      --accent: #2dd4bf;         
+      --accent-2: #60a5fa;         
+      --accent-red: #ff5a5f;        
+      --accent-glow: rgba(45,212,191,.18);
+      --red-glow: rgba(255,90,95,.12);
+    }
+
+    *{ box-sizing: border-box; }
+    html, body{ height: 100%; }
+    body{
+      margin: 0;
+      color: var(--text);
+      font-family: 'Segoe UI', Roboto, 'Apple SD Gothic Neo', sans-serif;
+      line-height: 1.65;
+
+      background:
+        radial-gradient(1200px 600px at 50% -10%, rgba(96,165,250,.10), transparent 60%),
+        radial-gradient(900px 500px at 10% 20%, rgba(45,212,191,.10), transparent 55%),
+        radial-gradient(900px 500px at 90% 25%, rgba(255,90,95,.06), transparent 55%),
+        var(--bg);
+      background-repeat: no-repeat;
+      background-attachment: scroll;
+    }
+
+    a{ color: inherit; }
+    img{ max-width: 100%; }
+
+    /*  Header / Navigation */
+    header{
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 1000;
+
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 5%;
+
+      background: rgba(11,15,20,.78);
+      backdrop-filter: blur(10px);
+
+   
+      background-image: linear-gradient(90deg,
+        rgba(45,212,191,.90),
+        rgba(96,165,250,.70),
+        rgba(255,90,95,.85)
+      );
+      background-repeat: no-repeat;
+      background-size: 100% 2px;
+      background-position: 0 100%;
+
+      border-bottom: 1px solid rgba(255,255,255,.08);
+    }
+    
+
+    .logo-container{
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-height: 52px;
+    }
+    .logo-container img{
+      height: 46px;
+      display: block;
+      filter: drop-shadow(0 0 10px rgba(45,212,191,.08));
+    }
+
+    .nav-container{
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .nav-menu{
+      display: flex;
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      gap: 4px;
+      align-items: center;
+    }
+
+    .nav-item{
+      position: relative;
+    }
+
+    /* hover 브리지: 메뉴->드롭다운 이동 중 닫힘 방지 */
+    .nav-item::after{
+      content:"";
+      position:absolute;
+      left:0; right:0;
+      top: 100%;
+      height: 14px;
+    }
+
+    .nav-item > a{
+      position: relative;
+      z-index: 3;
+
+      display: block;
+      padding: 16px 14px;
+      border-radius: 10px;
+
+      text-decoration: none;
+      font-weight: 900;
+      letter-spacing: .3px;
+      color: rgba(230,237,246,.92);
+
+      transition: background .18s ease, color .18s ease, box-shadow .18s ease;
+    }
+
+    .nav-item:hover > a{
+      background: rgba(255,255,255,.04);
+      color: var(--text);
+      box-shadow: 0 0 0 6px rgba(45,212,191,.06);
+    }
+
+    .nav-item > a::after{
+      content:"";
+      position:absolute;
+      left: 14px;
+      right: 14px;
+      bottom: 10px;
+      height: 2px;
+      border-radius: 999px;
+      background: linear-gradient(90deg, rgba(45,212,191,.85), rgba(255,90,95,.70));
+      opacity: 0;
+      transform: translateY(4px);
+      transition: .18s;
+    }
+    .nav-item:hover > a::after,
+    .nav-item.open > a::after{
+      opacity: .85;
+      transform: translateY(0);
+    }
+
+    .dropdown{
+      position: absolute;
+      top: calc(100% + 10px);
+      left: 0;
+      min-width: 190px;
+
+      list-style: none;
+      margin: 0;
+      padding: 10px 0;
+
+      background: rgba(12,18,28,.92);
+      border: 1px solid rgba(255,255,255,.10);
+      border-radius: 14px;
+      box-shadow: 0 18px 40px rgba(0,0,0,.45);
+      overflow: hidden;
+
+      opacity: 0;
+      visibility: hidden;
+      transform: translateY(-6px);
+      pointer-events: none;
+      transition: opacity .18s ease, transform .18s ease, visibility .18s ease;
+
+      z-index: 2000;
+    }
+
+    .nav-item:hover .dropdown,
+    .nav-item.open .dropdown{
+      opacity: 1;
+      visibility: visible;
+      transform: translateY(0);
+      pointer-events: auto;
+    }
+
+    .dropdown li a{
+      display: block;
+      padding: 13px 16px;
+      text-decoration: none;
+      font-size: .92rem;
+      color: rgba(230,237,246,.75);
+      transition: background .18s ease, color .18s ease;
+    }
+    .dropdown li a:hover{
+      background: rgba(255,255,255,.05);
+      color: var(--accent);
+    }
+
+    .auth-buttons{
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+    .auth-buttons a{
+      white-space: nowrap;
+      text-decoration: none;
+      font-size: .85rem;
+      font-weight: 900;
+
+      padding: 10px 12px;
+      border-radius: 999px;
+
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.02);
+      color: rgba(230,237,246,.90);
+
+      transition: transform .18s ease, border-color .18s ease, box-shadow .18s ease, background .18s ease;
+    }
+    .auth-buttons a:hover{
+      transform: translateY(-1px);
+      border-color: rgba(45,212,191,.55);
+      box-shadow: 0 0 0 8px rgba(45,212,191,.08);
+      background: rgba(255,255,255,.04);
+    }
+
+    
+    .hero{
+      /* 100vh 대신 svh 우선: 모바일/일부 환경에서 잘림 방지 */
+      height: 100vh;
+      height: 100svh;    
+      min-height: 620px;
+
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      gap: 20px;
+
+      padding: 0 6%;
+      position: relative;
+      overflow: hidden;
+
+      background:
+        linear-gradient(rgba(11,15,20,.70), rgba(11,15,20,.86)),
+        url('https://images.unsplash.com/photo-1550751827-4bd374c3f58b?auto=format&fit=crop&q=80&w=2070');
+      background-size: cover;
+      background-position: center;
+    }
+
+    .hero-image-container {
+      margin-bottom: 10px; 
+      animation: fadeInDown 1s ease-out; /* 부드러운 등장 효과 (선택사항) */
+    }
+
+    .hero-top-img {
+      max-width: 250px;  /* 이미지 최대 너비 (원하는 크기로 조절하세요) */
+      height: auto;
+      filter: drop-shadow(0 0 15px var(--accent-glow)); /* 이미지에 부드러운 광채 효과 */
+    }
+
+    /* 등장 애니메이션 (선택사항) */
+    @keyframes fadeInDown {
+    from {
+      opacity: 0;
+      transform: translateY(-20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+}
+
+    /* 아래로 자연스럽게 페이드(끊김 해결) */
+    .hero::before{
+      content:"";
+      position:absolute;
+      left:0; right:0; bottom:0;
+      height: 180px;
+      background: linear-gradient(to bottom, rgba(11,15,20,0), var(--bg));
+      z-index: 1;
+      pointer-events:none;
+    }
+
+    /* 스캔라인 */
+    .hero::after{
+      content:"";
+      position:absolute;
+      inset:0;
+      background: repeating-linear-gradient(
+        to bottom,
+        rgba(255,255,255,.03) 0px,
+        rgba(255,255,255,.03) 1px,
+        transparent 2px,
+        transparent 6px
+      );
+      opacity:.08;
+      z-index: 1;
+      pointer-events:none;
+    }
+
+    /* hero 텍스트는 pseudo 위로 */
+    .hero > *{
+      position: relative;
+      z-index: 2;
+    }
+
+    .hero h1{
+      margin: 0;
+      font-size: clamp(2.6rem, 6vw, 4.2rem);
+      letter-spacing: 2px;
+      background: linear-gradient(90deg, var(--accent), rgba(96,165,250,.95), var(--accent-red));
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      text-shadow: 0 0 20px rgba(45,212,191,.08);
+    }
+
+    .hero p{
+      margin-top: 14px;
+      color: rgba(230,237,246,.78);
+      font-size: 1.05rem;
+      max-width: 780px;
+    }
+
+    /*  Main Content */
+    .container{
+      padding: 86px 10% 80px;
+    }
+    #about{ scroll-margin-top: 110px; }
+
+    .section-title{
+      font-size: 2rem;
+      font-weight: 1000;
+      text-align: center;
+      margin: 0 0 26px;
+      color: var(--text);
+      position: relative;
+      padding-bottom: 14px;
+    }
+    .section-title::after{
+      content:"";
+      position:absolute;
+      left: 50%;
+      transform: translateX(-50%);
+      bottom: 0;
+      width: 140px;
+      height: 2px;
+      border-radius: 999px;
+      background: linear-gradient(90deg, rgba(45,212,191,.85), rgba(255,90,95,.75));
+      opacity: .9;
+    }
+
+    .about-content{
+      background: linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.015));
+      border: 1px solid rgba(255,255,255,.10);
+      border-radius: 16px;
+      padding: 44px 40px;
+      margin-bottom: 46px;
+      box-shadow: 0 10px 30px rgba(0,0,0,.35);
+      position: relative;
+      overflow: hidden;
+    }
+    .about-content::before{
+      content:"";
+      position:absolute;
+      left:0; right:0; top:0;
+      height: 2px;
+      background: linear-gradient(90deg, rgba(45,212,191,.75), rgba(96,165,250,.55), rgba(255,90,95,.75));
+      opacity: .65;
+    }
+
+    .about-content p{ color: rgba(230,237,246,.82); }
+
+    .about-content h3{
+      margin-top: 46px;
+      font-size: 1.55rem;
+      text-align: center;
+      color: var(--text);
+    }
+    .about-content h3 span{
+      background: linear-gradient(90deg, rgba(45,212,191,.95), rgba(255,90,95,.90));
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+
+    .activity-list{
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin: 26px auto 0;
+      align-items: center;
+    }
+
+    .activity-item{
+      width: 100%;
+      max-width: 860px;
+      background: rgba(12,18,28,.60);
+      border: 1px solid rgba(255,255,255,.10);
+      border-radius: 14px;
+
+      padding: 16px 18px 16px 44px;
+      font-size: 1.05rem;
+      color: rgba(230,237,246,.86);
+
+      position: relative;
+      transition: transform .18s ease, background .18s ease, border-color .18s ease, box-shadow .18s ease;
+    }
+    .activity-item::before{
+      content:"";
+      position:absolute;
+      left: 16px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 10px;
+      height: 10px;
+      border-radius: 3px;
+      background: linear-gradient(180deg, rgba(45,212,191,.8), rgba(255,90,95,.55));
+      box-shadow: 0 0 0 6px rgba(45,212,191,.08);
+    }
+    .activity-item:hover{
+      transform: translateY(-2px);
+      background: rgba(255,255,255,.03);
+      border-color: rgba(45,212,191,.35);
+      box-shadow: 0 0 0 8px rgba(45,212,191,.06);
+    }
+
+    .grid{
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 18px;
+    }
+
+    .card{
+      background: rgba(12,18,28,.55);
+      border: 1px solid rgba(255,255,255,.10);
+      border-radius: 16px;
+      padding: 28px;
+      min-height: 220px;
+      box-shadow: 0 10px 30px rgba(0,0,0,.25);
+      transition: transform .18s ease, border-color .18s ease, box-shadow .18s ease;
+      position: relative;
+      overflow: hidden;
+    }
+    .card::before{
+      content:"";
+      position:absolute;
+      left:0; top:0; bottom:0;
+      width: 3px;
+      background: linear-gradient(180deg, rgba(45,212,191,.9), rgba(255,90,95,.75));
+      opacity: .9;
+    }
+    .card:hover{
+      transform: translateY(-3px);
+      border-color: rgba(45,212,191,.30);
+      box-shadow: 0 0 0 10px rgba(45,212,191,.05), 0 16px 40px rgba(0,0,0,.35);
+    }
+    .card h3{
+      margin: 0 0 10px;
+      font-weight: 1000;
+      color: var(--text);
+    }
+    .card p{ color: rgba(230,237,246,.80); }
+
+    em{
+      color: var(--accent);
+      font-style: normal;
+      font-weight: 1000;
+    }
+
+    .footer{
+      text-align: center;
+      padding: 50px 18px;
+      border-top: 1px solid rgba(255,255,255,.08);
+      color: rgba(154,164,178,.80);
+      font-size: .85rem;
+      background: rgba(0,0,0,.10);
+    }
+
+   
+    @media (max-width: 900px){
+      header{ padding: 12px 4%; }
+      .nav-item > a{ padding: 14px 10px; }
+      .container{ padding: 80px 6% 70px; }
+    }
+    @media (max-width: 740px){
+      .nav-menu{ display: none; } /* 원하면 햄버거로 확장 가능 */
+      .logo-container img{ height: 42px; }
+      .auth-buttons a{ padding: 9px 11px; font-size: .82rem; }
+      .about-content{ padding: 30px 22px; }
+      .hero::before{ height: 140px; } /* 모바일에서는 페이드 높이 조금 줄임 */
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <div class="logo-container">
+      <a href="1.html"> 
+    <img src="securityfact_logo.png" alt="SF Logo" />
+      </a>
+    </div>
+
+
+    <div class="nav-container">
+      <ul class="nav-menu">
+        <li class="nav-item">
+          <a href="#about">ABOUT</a>
+          <ul class="dropdown">
+            <li><a href="about_intro.html">동아리 소개</a></li>
+            <li><a href="about_org.html">조직도</a></li>
+            <li><a href="about_history.html">연혁</a></li>
+          </ul>
+        </li>
+
+        <li class="nav-item">
+          <a href="#ctf">CTF</a>
+          <ul class="dropdown">
+            <li><a href="ctf_awards.html">수상 실적</a></li>
+            <li><a href="ctf_reports.html">Write-up</a></li>
+          </ul>
+        </li>
+
+        <li class="nav-item"><a href="board.html">BOARD</a></li>
+
+        <li class="nav-item">
+          <a href="recruit_notice.html">RECRUIT</a>
+          <ul class="dropdown">
+            <li><a href="recruit_notice.html">모집 공고</a></li>
+            <li><a href="recruit_faq.html">FAQ</a></li>
+          </ul>
+        </li>
+      </ul>
+
+      <div class="auth-buttons">
+        <a href="login.html">로그인</a>
+        <a href="signup.html">회원가입</a>
+      </div>
+    </div>
+  </header>
+
+  <section class="hero">
+  <div class="hero-image-container">
+    <img src="securityfact_logo_mid.png" alt="Hero Icon" class="hero-top-img">
+  </div>
+
+    <h1>SECURITY FACT</h1>
+    <p>건국대학교 공과대학 정보보안 학술 동아리</p>
+  </section>
+
+  <div class="container" id="about">
+    <h2 class="section-title">About Us</h2>
+
+    <div class="about-content">
+      <p style="margin: 0 auto; text-align: center; font-size: 1.25rem; margin-bottom: 10px;">
+        <strong>SecurityFACT (Security Family Against Cyber Terror)</strong>
+      </p>
+
+      <p style="max-width: 860px; margin: 0 auto; text-align: left;">
+        2010년 최초 설립되었으며, 해킹 및 정보보안에 열정을 가진 건국대학교 학우분들로 이루어진
+        공과대학 및 컴퓨터공학부 소속 동아리입니다.
+      </p>
+
+      <h3><span>2025년 1학기 주요 활동 현황</span></h3>
+
+      <div class="activity-list">
+        <div class="activity-item">다양한 스터디 (웹해킹, 시스템 해킹 등)</div>
+        <div class="activity-item">연합 프로젝트 진행</div>
+        <div class="activity-item">IFF-Securify 연합 세미나 (한양대 ICEWALL x 순천향대 SecurityFirst)</div>
+        <div class="activity-item">국제 및 국내 해킹 방어 대회 출전 (핵테온 세종 본선 진출 등)</div>
+        <div class="activity-item">외부 교육 참여 (Best of the Best, Whitehat)</div>
+        <div class="activity-item">국내 대학 연합 컨퍼런스 발표 및 기술 교류</div>
+      </div>
+
+      <p style="margin-top: 28px; color: var(--muted);">
+        정보보안은 굉장히 많은 분야를 지니고 있습니다. 저희는 그 본질을 탐구합니다.
+      </p>
+    </div>
+
+    <div class="grid">
+      <div class="card">
+        <h3>Our Mission</h3>
+        <p>
+          단순한 기술 습득을 넘어 <em>보안의 '진실(Fact)'</em>을 규명합니다.
+          화이트햇 해커로서의 윤리 의식을 바탕으로, 사이버 위협으로부터 세상을 보호하는
+          강력한 방패가 되는 것이 우리의 사명입니다.
+        </p>
+      </div>
+
+      <div class="card">
+        <h3>Major Awards</h3>
+        <p>
+          핵테온 세종 본선 진출을 비롯하여 국내외 유수의 CTF 대회에서 우수한 성적을 거두며
+          팀의 기술력을 매년 입증하고 있습니다.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <footer class="footer">
+    &copy; 2025 Security Fact. All Rights Reserved. <br />
+    Konkuk University College of Engineering
+  </footer>
+
+  <script>
+    // 드롭다운 클릭 토글
+    document.addEventListener("DOMContentLoaded", () => {
+      const items = document.querySelectorAll(".nav-item");
+
+      items.forEach((item) => {
+        const dropdown = item.querySelector(".dropdown");
+        const link = item.querySelector(":scope > a");
+        if (!dropdown || !link) return;
+
+        link.addEventListener("click", (e) => {
+          e.preventDefault();
+          const isOpen = item.classList.contains("open");
+          items.forEach(i => i.classList.remove("open"));
+          if (!isOpen) item.classList.add("open");
+        });
+      });
+
+      document.addEventListener("click", (e) => {
+        const inside = e.target.closest(".nav-item");
+        if (!inside) items.forEach(i => i.classList.remove("open"));
+      });
+
+      document.addEventListener("keydown", (e) => {
+        if (e.key === "Escape") items.forEach(i => i.classList.remove("open"));
+      });
+    });
+  </script>
+</body>
+</html>

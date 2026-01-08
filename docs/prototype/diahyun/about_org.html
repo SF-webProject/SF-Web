@@ -1,0 +1,771 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>about_org | Security Fact</title>
+
+  <style>
+    :root{
+      --bg: #0b0f14;
+      --surface: #0f1623;
+      --surface-2: #0c121c;
+      --text: #e6edf6;
+      --muted: #9aa4b2;
+      --border: rgba(255,255,255,.10);
+
+      --accent: #2dd4bf;         /* Teal main */
+      --accent-2: #60a5fa;       /* Soft blue */
+      --accent-red: #ff5a5f;     /* Soft red sub */
+      --accent-glow: rgba(45,212,191,.18);
+      --red-glow: rgba(255,90,95,.12);
+    }
+
+    *{ box-sizing: border-box; }
+    html, body{ height: 100%; }
+    body{
+      margin: 0;
+      color: var(--text);
+      font-family: 'Pretendard', 'Segoe UI', Roboto, 'Apple SD Gothic Neo', sans-serif;
+      line-height: 1.65;
+
+      background:
+        radial-gradient(1200px 600px at 50% -10%, rgba(96,165,250,.10), transparent 60%),
+        radial-gradient(900px 500px at 10% 20%, rgba(45,212,191,.10), transparent 55%),
+        radial-gradient(900px 500px at 90% 25%, rgba(255,90,95,.06), transparent 55%),
+        var(--bg);
+      background-repeat: no-repeat;
+      background-attachment: scroll;
+    }
+
+    a{ color: inherit; }
+    img{ max-width: 100%; }
+
+
+    header{
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 1000;
+
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 5%;
+
+      background: rgba(11,15,20,.78);
+      backdrop-filter: blur(10px);
+
+      background-image: linear-gradient(90deg,
+        rgba(45,212,191,.90),
+        rgba(96,165,250,.70),
+        rgba(255,90,95,.85)
+      );
+      background-repeat: no-repeat;
+      background-size: 100% 2px;
+      background-position: 0 100%;
+
+      border-bottom: 1px solid rgba(255,255,255,.08);
+    }
+
+    .logo-container{
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-height: 52px;
+    }
+    .logo-container img{
+      height: 46px;
+      display: block;
+      filter: drop-shadow(0 0 10px rgba(45,212,191,.08));
+    }
+
+    .nav-container{
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .nav-menu{
+      display: flex;
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      gap: 4px;
+      align-items: center;
+    }
+
+    .nav-item{ position: relative; }
+
+   
+    .nav-item::after{
+      content:"";
+      position:absolute;
+      left:0; right:0;
+      top: 100%;
+      height: 14px;
+    }
+
+    .nav-item > a{
+      position: relative;
+      z-index: 3;
+
+      display: block;
+      padding: 16px 14px;
+      border-radius: 10px;
+
+      text-decoration: none;
+      font-weight: 900;
+      letter-spacing: .3px;
+      color: rgba(230,237,246,.92);
+
+      transition: background .18s ease, color .18s ease, box-shadow .18s ease;
+    }
+
+    .nav-item:hover > a{
+      background: rgba(255,255,255,.04);
+      color: var(--text);
+      box-shadow: 0 0 0 6px rgba(45,212,191,.06);
+    }
+
+    .nav-item > a::after{
+      content:"";
+      position:absolute;
+      left: 14px;
+      right: 14px;
+      bottom: 10px;
+      height: 2px;
+      border-radius: 999px;
+      background: linear-gradient(90deg, rgba(45,212,191,.85), rgba(255,90,95,.70));
+      opacity: 0;
+      transform: translateY(4px);
+      transition: .18s;
+    }
+    .nav-item:hover > a::after,
+    .nav-item.open > a::after{
+      opacity: .85;
+      transform: translateY(0);
+    }
+
+    .dropdown{
+      position: absolute;
+      top: calc(100% + 10px);
+      left: 0;
+      min-width: 190px;
+
+      list-style: none;
+      margin: 0;
+      padding: 10px 0;
+
+      background: rgba(12,18,28,.92);
+      border: 1px solid rgba(255,255,255,.10);
+      border-radius: 14px;
+      box-shadow: 0 18px 40px rgba(0,0,0,.45);
+      overflow: hidden;
+
+      opacity: 0;
+      visibility: hidden;
+      transform: translateY(-6px);
+      pointer-events: none;
+      transition: opacity .18s ease, transform .18s ease, visibility .18s ease;
+
+      z-index: 2000;
+    }
+
+    .nav-item:hover .dropdown,
+    .nav-item.open .dropdown{
+      opacity: 1;
+      visibility: visible;
+      transform: translateY(0);
+      pointer-events: auto;
+    }
+
+    .dropdown li a{
+      display: block;
+      padding: 13px 16px;
+      text-decoration: none;
+      font-size: .92rem;
+      color: rgba(230,237,246,.75);
+      transition: background .18s ease, color .18s ease;
+    }
+    .dropdown li a:hover{
+      background: rgba(255,255,255,.05);
+      color: var(--accent);
+    }
+
+    .auth-buttons{
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+    .auth-buttons a{
+      white-space: nowrap;
+      text-decoration: none;
+      font-size: .85rem;
+      font-weight: 900;
+
+      padding: 10px 12px;
+      border-radius: 999px;
+
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.02);
+      color: rgba(230,237,246,.90);
+
+      transition: transform .18s ease, border-color .18s ease, box-shadow .18s ease, background .18s ease;
+    }
+    .auth-buttons a:hover{
+      transform: translateY(-1px);
+      border-color: rgba(45,212,191,.55);
+      box-shadow: 0 0 0 8px rgba(45,212,191,.08);
+      background: rgba(255,255,255,.04);
+    }
+
+    main{
+      padding: 120px 10% 90px;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .page-title{
+      text-align: center;
+      margin-bottom: 40px;
+    }
+
+    .page-title h1{
+      margin: 0 0 10px;
+      font-size: clamp(2.2rem, 5vw, 3.2rem);
+      font-weight: 1000;
+      letter-spacing: -1px;
+
+      background: linear-gradient(90deg, var(--accent), rgba(96,165,250,.95), var(--accent-red));
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+
+    .page-title p{
+      margin: 0;
+      color: rgba(154,164,178,.90);
+      font-size: 1.05rem;
+    }
+
+  
+    .chart-wrap{
+      position: relative;
+      margin: 34px auto 0;
+      padding: 22px 10px 10px;
+      border-radius: 18px;
+      background: linear-gradient(180deg, rgba(255,255,255,.02), rgba(255,255,255,.01));
+      border: 1px solid rgba(255,255,255,.08);
+      box-shadow: 0 16px 45px rgba(0,0,0,.40);
+      overflow: hidden;
+    }
+
+    
+    .chart-wrap::before{
+      content:"";
+      position:absolute;
+      left:0; right:0; top:0;
+      height:2px;
+      background: linear-gradient(90deg, rgba(45,212,191,.85), rgba(96,165,250,.55), rgba(255,90,95,.85));
+      opacity:.75;
+    }
+
+    .chart-grid {
+      position: relative;
+      display: grid;
+      /* 상단/하단 모두 대응할 수 있도록 4열로 구성 */
+      grid-template-columns: repeat(4, 1fr); 
+      gap: 40px 20px;
+      padding: 40px 20px;
+      justify-items: center;
+      align-items: start;
+    }
+
+    /* (회장단) */
+    .top{
+      grid-row: 1;
+      order: 1;
+    }
+    .top.president { grid-column: 2; grid-row: 1; }
+    .top.vice { grid-column: 3; grid-row: 1; }
+
+    /* (4명) */
+    .bottom{
+      grid-row: 2;
+    }
+    .bottom.cfo{ grid-column: 1; }
+    .bottom.plan{ grid-column: 2; }
+    .bottom.design{ grid-column: 3; }
+    .bottom.leader{ grid-column: 4; }
+
+    /* 카드 디자인 */
+    .person{
+      width: 100%;
+      max-width: 260px;
+      text-align: center;
+      position: relative;
+      z-index: 2;
+      min-width: 0;
+    }
+
+    .role-label{
+      display: inline-block;
+      font-weight: 1000;
+      letter-spacing: .5px;
+      font-size: 1.02rem;
+      margin-bottom: 10px;
+
+      color: rgba(45,212,191,.95);
+      text-shadow: 0 0 12px rgba(45,212,191,.10);
+    }
+
+    .card{
+      background: rgba(12,18,28,.60);
+      border: 1px solid rgba(255,255,255,.10);
+      border-radius: 18px;
+      padding: 18px 16px 16px;
+      box-shadow: 0 12px 30px rgba(0,0,0,.35);
+      transition: transform .18s ease, border-color .18s ease, box-shadow .18s ease, background .18s ease;
+      overflow: hidden;
+      position: relative;
+      min-width: 0;
+    }
+
+    .card::before{
+      content:"";
+      position:absolute;
+      left:0; right:0; top:0;
+      height: 2px;
+      background: linear-gradient(90deg, rgba(45,212,191,.8), rgba(255,90,95,.65));
+      opacity: .85;
+    }
+
+    .card:hover{
+      transform: translateY(-3px);
+      border-color: rgba(45,212,191,.28);
+      box-shadow:
+        0 0 0 10px rgba(45,212,191,.05),
+        0 18px 44px rgba(0,0,0,.45);
+      background: rgba(255,255,255,.03);
+    }
+
+    .avatar{
+      width: 92px;
+      height: 92px;
+      margin: 6px auto 14px;
+      border-radius: 999px;
+
+      background:
+        radial-gradient(60px 60px at 50% 35%, rgba(255,255,255,.08), transparent 60%),
+        linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.02));
+      border: 1px solid rgba(255,255,255,.10);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+    }
+
+    .avatar svg{
+      width: 54px;
+      height: 54px;
+      opacity: .9;
+      fill: rgba(230,237,246,.80);
+    }
+
+    .nameplate{
+      margin: 0 auto;
+      width: 90%;
+      max-width: 210px;
+      padding: 8px 4px;
+      border-radius: 12px;
+      font-size: 0.95rem;/* 작은 화면에서 글자 크기 최적화 */
+
+      background: linear-gradient(90deg, rgba(45,212,191,.18), rgba(45,212,191,.10));
+      border: 1px solid rgba(45,212,191,.28);
+      color: rgba(230,237,246,.92);
+      font-weight: 1000;
+      font-size: 1.08rem;
+      letter-spacing: -.2px;
+
+      box-shadow: 0 0 0 8px rgba(45,212,191,.06);
+    }
+
+    .connectors{
+      position:absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 1;
+    }
+
+ 
+    .vision{
+      text-align:center;
+      margin-top: 24px;
+      padding: 32px 14px 10px;
+      border-top: 1px solid rgba(255,255,255,.08);
+      color: rgba(230,237,246,.86);
+      font-weight: 900;
+      line-height: 1.9;
+    }
+    .vision span{
+      background: linear-gradient(90deg, var(--accent), var(--accent-red));
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+
+    .nameplate, .role-label{
+      word-break: keep-all;
+      overflow-wrap: anywhere;
+    }
+
+
+    /* Footer */
+    .footer{
+      text-align: center;
+      padding: 50px 18px;
+      border-top: 1px solid rgba(255,255,255,.08);
+      color: rgba(154,164,178,.80);
+      font-size: .85rem;
+      background: rgba(0,0,0,.10);
+      margin-top: 60px;
+    }
+
+    /* 태블릿/분할화면용  */
+    
+    @media (max-width: 1100px) {
+      .chart-grid {
+        
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 30px 15px;
+      }
+    
+      .person {
+        
+        flex: 1 1 40%; 
+        max-width: 300px;
+      }
+    
+      /* 분할 화면에서는 복잡한 선 숨김 */
+      .connectors { display: none !important; }
+      .chart-wrap { padding-top: 10px; }
+      
+      
+      .top, .bottom { grid-column: auto !important; grid-row: auto !important; }
+    }
+    
+    /* --- 모바일 --- */
+    @media (max-width: 600px) {
+      .person {
+        flex: 1 1 100%; 
+      }
+    }
+  </style>
+</head>
+
+<body>
+  
+  <header>
+    <div class="logo-container">
+      <a href="1.html"> 
+        <img src="securityfact_logo.png" alt="SF Logo" />
+      </a>
+    </div>
+
+    <div class="nav-container">
+      <ul class="nav-menu">
+        <li class="nav-item">
+          <a href="#about">ABOUT</a>
+          <ul class="dropdown">
+            <li><a href="about_intro.html">동아리 소개</a></li>
+            <li><a href="about_org.html">조직도</a></li>
+            <li><a href="about_history.html">연혁</a></li>
+          </ul>
+        </li>
+
+        <li class="nav-item">
+          <a href="#ctf">CTF</a>
+          <ul class="dropdown">
+            <li><a href="ctf_awards.html">수상 실적</a></li>
+            <li><a href="ctf_reports.html">Write-up</a></li>
+          </ul>
+        </li>
+
+        <li class="nav-item"><a href="board.html">BOARD</a></li>
+
+        <li class="nav-item">
+          <a href="recruit_notice.html">RECRUIT</a>
+          <ul class="dropdown">
+            <li><a href="recruit_notice.html">모집 공고</a></li>
+            <li><a href="recruit_faq.html">FAQ</a></li>
+          </ul>
+        </li>
+      </ul>
+
+      <div class="auth-buttons">
+        <a href="login.html">로그인</a>
+        <a href="signup.html">회원가입</a>
+      </div>
+    </div>
+  </header>
+
+  <main id="about">
+    <div class="page-title">
+      <h1>SecurityFACT 2학기 운영진 소개</h1>
+      <p>조직 운영을 책임지는 운영진을 소개합니다</p>
+    </div>
+
+    <section class="chart-wrap" aria-label="Organization Chart">
+      <!-- 커넥터 라인(SVG 자동 생성) -->
+      <svg class="connectors" id="connectors" aria-hidden="true"></svg>
+
+      <div class="chart-grid" id="chartGrid">
+        <!-- Top row -->
+        <div class="person top president" data-node="top-1">
+          <div class="role-label">회장</div>
+          <div class="card">
+            <div class="avatar">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M12 12a4.5 4.5 0 1 0-4.5-4.5A4.5 4.5 0 0 0 12 12Zm0 2c-4.42 0-8 2.24-8 5v1h16v-1c0-2.76-3.58-5-8-5Z"/>
+              </svg>
+            </div>
+            <div class="nameplate">노민영</div>
+          </div>
+        </div>
+
+        <div class="person top vice" data-node="top-2">
+          <div class="role-label">부회장</div>
+          <div class="card">
+            <div class="avatar">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M12 12a4.5 4.5 0 1 0-4.5-4.5A4.5 4.5 0 0 0 12 12Zm0 2c-4.42 0-8 2.24-8 5v1h16v-1c0-2.76-3.58-5-8-5Z"/>
+              </svg>
+            </div>
+            <div class="nameplate">김휘성</div>
+          </div>
+        </div>
+
+        <!-- Bottom row -->
+        <div class="person bottom cfo" data-node="bottom-1">
+          <div class="role-label">총무</div>
+          <div class="card">
+            <div class="avatar">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M12 12a4.5 4.5 0 1 0-4.5-4.5A4.5 4.5 0 0 0 12 12Zm0 2c-4.42 0-8 2.24-8 5v1h16v-1c0-2.76-3.58-5-8-5Z"/>
+              </svg>
+            </div>
+            <div class="nameplate">남유찬</div>
+          </div>
+        </div>
+
+        <div class="person bottom plan" data-node="bottom-2">
+          <div class="role-label">기획</div>
+          <div class="card">
+            <div class="avatar">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M12 12a4.5 4.5 0 1 0-4.5-4.5A4.5 4.5 0 0 0 12 12Zm0 2c-4.42 0-8 2.24-8 5v1h16v-1c0-2.76-3.58-5-8-5Z"/>
+              </svg>
+            </div>
+            <div class="nameplate">송현준</div>
+          </div>
+        </div>
+
+        <div class="person bottom design" data-node="bottom-3">
+          <div class="role-label">디자인</div>
+          <div class="card">
+            <div class="avatar">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M12 12a4.5 4.5 0 1 0-4.5-4.5A4.5 4.5 0 0 0 12 12Zm0 2c-4.42 0-8 2.24-8 5v1h16v-1c0-2.76-3.58-5-8-5Z"/>
+              </svg>
+            </div>
+            <div class="nameplate">김가겸</div>
+          </div>
+        </div>
+
+        <div class="person bottom leader" data-node="bottom-4">
+          <div class="role-label">12기 기장</div>
+          <div class="card">
+            <div class="avatar">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M12 12a4.5 4.5 0 1 0-4.5-4.5A4.5 4.5 0 0 0 12 12Zm0 2c-4.42 0-8 2.24-8 5v1h16v-1c0-2.76-3.58-5-8-5Z"/>
+              </svg>
+            </div>
+            <div class="nameplate">안동기</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="vision">
+        각 분야의 전문성을 바탕으로 끊임없이 정진하여<br />
+        <span>미래의 보안 전문가로 성장합니다.</span>
+      </div>
+    </section>
+
+    <footer class="footer">
+      &copy; 2025 Security Fact. All Rights Reserved. <br />
+      Konkuk University College of Engineering
+    </footer>
+  </main>
+
+  <script>
+    // 첫페이지 드롭다운 클릭 토글 그대로
+    document.addEventListener("DOMContentLoaded", () => {
+      const items = document.querySelectorAll(".nav-item");
+
+      items.forEach((item) => {
+        const dropdown = item.querySelector(".dropdown");
+        const link = item.querySelector(":scope > a");
+        if (!dropdown || !link) return;
+
+        link.addEventListener("click", (e) => {
+          e.preventDefault();
+          const isOpen = item.classList.contains("open");
+          items.forEach(i => i.classList.remove("open"));
+          if (!isOpen) item.classList.add("open");
+        });
+      });
+
+      document.addEventListener("click", (e) => {
+        const inside = e.target.closest(".nav-item");
+        if (!inside) items.forEach(i => i.classList.remove("open"));
+      });
+
+      document.addEventListener("keydown", (e) => {
+        if (e.key === "Escape") items.forEach(i => i.classList.remove("open"));
+      });
+    });
+
+  
+    // 조직도 커넥터 라인 자동 생성
+    // (top 2명 -> 중간 가로선 -> bottom 4명)
+
+    function drawConnectors(){
+      const wrap = document.querySelector(".chart-wrap");
+      const svg = document.getElementById("connectors");
+      const grid = document.getElementById("chartGrid");
+
+      // 모바일(740px 이하)에서는 CSS로 SVG 숨김이라 조용히 종료
+      if (!wrap || !svg || !grid) return;
+
+      const wrapRect = wrap.getBoundingClientRect();
+      const gridRect = grid.getBoundingClientRect();
+
+      // SVG 크기/좌표계
+      const w = wrapRect.width;
+      const h = wrapRect.height;
+      svg.setAttribute("viewBox", `0 0 ${w} ${h}`);
+      svg.setAttribute("width", w);
+      svg.setAttribute("height", h);
+
+      // 기존 라인 제거
+      while(svg.firstChild) svg.removeChild(svg.firstChild);
+
+      // helper: element center (wrap 기준)
+      const centerBottom = (el) => {
+        const r = el.getBoundingClientRect();
+        const cx = (r.left - wrapRect.left) + r.width / 2;
+        const cy = (r.top - wrapRect.top) + r.height; // bottom
+        return {x: cx, y: cy};
+      };
+      const centerTop = (el) => {
+        const r = el.getBoundingClientRect();
+        const cx = (r.left - wrapRect.left) + r.width / 2;
+        const cy = (r.top - wrapRect.top); // top
+        return {x: cx, y: cy};
+      };
+
+      const top1 = document.querySelector('[data-node="top-1"] .card');
+      const top2 = document.querySelector('[data-node="top-2"] .card');
+      const b1 = document.querySelector('[data-node="bottom-1"] .card');
+      const b2 = document.querySelector('[data-node="bottom-2"] .card');
+      const b3 = document.querySelector('[data-node="bottom-3"] .card');
+      const b4 = document.querySelector('[data-node="bottom-4"] .card');
+      if (!top1 || !top2 || !b1 || !b2 || !b3 || !b4) return;
+
+      const t1 = centerBottom(top1);
+      const t2 = centerBottom(top2);
+
+      const bt1 = centerTop(b1);
+      const bt2 = centerTop(b2);
+      const bt3 = centerTop(b3);
+      const bt4 = centerTop(b4);
+
+      // 중간 가로선 y: top 카드 아래와 bottom 카드 위의 중간쯤
+      const midY = Math.round((t1.y + bt1.y) / 2);
+
+      // 라인 스타일
+      const mkLine = (x1,y1,x2,y2,thick=false) => {
+        const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+        line.setAttribute("x1", x1); line.setAttribute("y1", y1);
+        line.setAttribute("x2", x2); line.setAttribute("y2", y2);
+        line.setAttribute("stroke", "rgba(230,237,246,.30)");
+        line.setAttribute("stroke-width", thick ? "2.2" : "2");
+        line.setAttribute("stroke-linecap", "round");
+        return line;
+      };
+
+      // 포인트(Teal->Red) 느낌을 위해 중앙 라인에 그라데이션 stroke
+      const defs = document.createElementNS("http://www.w3.org/2000/svg", "defs");
+      const grad = document.createElementNS("http://www.w3.org/2000/svg", "linearGradient");
+      grad.setAttribute("id", "g1");
+      grad.setAttribute("x1", "0"); grad.setAttribute("y1", "0");
+      grad.setAttribute("x2", "1"); grad.setAttribute("y2", "0");
+
+      const s1 = document.createElementNS("http://www.w3.org/2000/svg", "stop");
+      s1.setAttribute("offset", "0%");
+      s1.setAttribute("stop-color", "rgba(45,212,191,.75)");
+      const s2 = document.createElementNS("http://www.w3.org/2000/svg", "stop");
+      s2.setAttribute("offset", "50%");
+      s2.setAttribute("stop-color", "rgba(96,165,250,.45)");
+      const s3 = document.createElementNS("http://www.w3.org/2000/svg", "stop");
+      s3.setAttribute("offset", "100%");
+      s3.setAttribute("stop-color", "rgba(255,90,95,.70)");
+
+      grad.appendChild(s1); grad.appendChild(s2); grad.appendChild(s3);
+      defs.appendChild(grad);
+      svg.appendChild(defs);
+
+      // 1) top1, top2에서 midY까지 내려오는 세로선
+      svg.appendChild(mkLine(t1.x, t1.y, t1.x, midY));
+      svg.appendChild(mkLine(t2.x, t2.y, t2.x, midY));
+
+      // 2) 상단 두 선을 잇는 가로선(미세) (이미지의 상단 바 느낌)
+      const topBarY = Math.round(midY - 70);
+      const topBar = mkLine(t1.x, topBarY, t2.x, topBarY);
+      topBar.setAttribute("stroke", "rgba(230,237,246,.22)");
+      svg.appendChild(topBar);
+
+      // 3) topBar 중앙에서 midY까지 내려오는 중앙선
+      const midX = Math.round((t1.x + t2.x) / 2);
+      svg.appendChild(mkLine(midX, topBarY, midX, midY, true));
+
+      // 4) midY 가로 메인 라인(그라데이션)
+      const leftX = Math.min(bt1.x, bt2.x, bt3.x, bt4.x);
+      const rightX = Math.max(bt1.x, bt2.x, bt3.x, bt4.x);
+
+      const main = mkLine(leftX, midY, rightX, midY, true);
+      main.setAttribute("stroke", "url(#g1)");
+      main.setAttribute("stroke-opacity", "0.9");
+      svg.appendChild(main);
+
+      // 5) bottom 카드들로 내려가는 세로선
+      svg.appendChild(mkLine(bt1.x, midY, bt1.x, bt1.y));
+      svg.appendChild(mkLine(bt2.x, midY, bt2.x, bt2.y));
+      svg.appendChild(mkLine(bt3.x, midY, bt3.x, bt3.y));
+      svg.appendChild(mkLine(bt4.x, midY, bt4.x, bt4.y));
+    }
+
+    /*
+    window.addEventListener("load", drawConnectors);
+    window.addEventListener("resize", () => {
+      // 너무 잦은 리사이즈 호출 방지 (간단 디바운스)
+      clearTimeout(window.__sfResizeTimer);
+      window.__sfResizeTimer = setTimeout(drawConnectors, 50);
+    });
+    document.fonts.ready.then(drawConnectors);*/
+  </script>
+</body>
+</html>

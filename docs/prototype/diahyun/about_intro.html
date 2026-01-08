@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>About Intro | Security Fact</title>
+
+  <style>
+    :root{
+      --bg: #0b0f14;
+      --surface: #0f1623;
+      --surface-2: #0c121c;
+      --text: #e6edf6;
+      --muted: #9aa4b2;
+      --border: rgba(255,255,255,.10);
+
+      --accent: #2dd4bf;           
+      --accent-2: #60a5fa;          
+      --accent-red: #ff5a5f;        
+      --accent-glow: rgba(45,212,191,.18);
+      --red-glow: rgba(255,90,95,.12);
+    }
+
+    *{ box-sizing: border-box; }
+    html, body{ height: 100%; }
+    body{
+      margin: 0;
+      color: var(--text);
+      font-family: 'Segoe UI', Roboto, 'Apple SD Gothic Neo', sans-serif;
+      line-height: 1.7;
+
+      background-color: var(--bg);
+      background-image:
+      radial-gradient(circle at 50% -10%, rgba(96, 165, 250, 0.12), transparent 70%),
+      radial-gradient(circle at 10% 30%, rgba(45, 212, 191, 0.08), transparent 60%),
+      radial-gradient(circle at 90% 40%, rgba(255, 90, 95, 0.05), transparent 60%);
+  
+      /*배경을 화면에 고정*/
+      background-attachment: fixed;
+      background-size: cover;
+    }
+
+    a{ color: inherit; text-decoration: none; }
+    img{ max-width: 100%; display:block; }
+
+
+    header{
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 1000;
+
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 5%;
+
+      background: rgba(11,15,20,.78);
+      backdrop-filter: blur(10px);
+
+      background-image: linear-gradient(90deg,
+        rgba(45,212,191,.90),
+        rgba(96,165,250,.70),
+        rgba(255,90,95,.85)
+      );
+      background-repeat: no-repeat;
+      background-size: 100% 2px;
+      background-position: 0 100%;
+
+      border-bottom: 1px solid rgba(255,255,255,.08);
+    }
+
+    .logo-container{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      min-height:52px;
+    }
+    .logo-container img{
+      height: 46px;
+      filter: drop-shadow(0 0 10px rgba(45,212,191,.08));
+    }
+
+    .nav-container{ display:flex; align-items:center; gap:16px; }
+
+    .nav-menu{
+      display:flex;
+      list-style:none;
+      margin:0;
+      padding:0;
+      gap:4px;
+      align-items:center;
+    }
+
+    .nav-item{ position: relative; }
+
+    .nav-item::after{
+      content:"";
+      position:absolute;
+      left:0; right:0;
+      top:100%;
+      height:14px;
+    }
+
+    .nav-item > a{
+      position: relative;
+      z-index: 3;
+
+      display:block;
+      padding: 16px 14px;
+      border-radius: 10px;
+
+      font-weight: 900;
+      letter-spacing: .3px;
+      color: rgba(230,237,246,.92);
+
+      transition: background .18s ease, color .18s ease, box-shadow .18s ease;
+    }
+    .nav-item:hover > a{
+      background: rgba(255,255,255,.04);
+      color: var(--text);
+      box-shadow: 0 0 0 6px rgba(45,212,191,.06);
+    }
+
+    .nav-item > a::after{
+      content:"";
+      position:absolute;
+      left: 14px;
+      right: 14px;
+      bottom: 10px;
+      height: 2px;
+      border-radius: 999px;
+      background: linear-gradient(90deg, rgba(45,212,191,.85), rgba(255,90,95,.70));
+      opacity: 0;
+      transform: translateY(4px);
+      transition: .18s;
+    }
+    .nav-item:hover > a::after,
+    .nav-item.open > a::after{
+      opacity: .85;
+      transform: translateY(0);
+    }
+
+    .dropdown{
+      position:absolute;
+      top: calc(100% + 10px);
+      left:0;
+      min-width: 190px;
+
+      list-style:none;
+      margin:0;
+      padding: 10px 0;
+
+      background: rgba(12,18,28,.92);
+      border: 1px solid rgba(255,255,255,.10);
+      border-radius: 14px;
+      box-shadow: 0 18px 40px rgba(0,0,0,.45);
+      overflow:hidden;
+
+      opacity:0;
+      visibility:hidden;
+      transform: translateY(-6px);
+      pointer-events:none;
+      transition: opacity .18s ease, transform .18s ease, visibility .18s ease;
+
+      z-index: 2000;
+    }
+    .nav-item:hover .dropdown,
+    .nav-item.open .dropdown{
+      opacity:1;
+      visibility:visible;
+      transform: translateY(0);
+      pointer-events:auto;
+    }
+
+    .dropdown li a{
+      display:block;
+      padding: 13px 16px;
+      font-size: .92rem;
+      color: rgba(230,237,246,.75);
+      transition: background .18s ease, color .18s ease;
+    }
+    .dropdown li a:hover{
+      background: rgba(255,255,255,.05);
+      color: var(--accent);
+    }
+
+    .auth-buttons{ display:flex; gap:10px; align-items:center; }
+    .auth-buttons a{
+      white-space: nowrap;
+      font-size:.85rem;
+      font-weight:900;
+      padding: 10px 12px;
+      border-radius: 999px;
+
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.02);
+      color: rgba(230,237,246,.90);
+
+      transition: transform .18s ease, border-color .18s ease, box-shadow .18s ease, background .18s ease;
+    }
+    .auth-buttons a:hover{
+      transform: translateY(-1px);
+      border-color: rgba(45,212,191,.55);
+      box-shadow: 0 0 0 8px rgba(45,212,191,.08);
+      background: rgba(255,255,255,.04);
+    }
+
+    /* ========================= Page Layout ========================= */
+    .container{
+      padding: 120px 10% 80px; 
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    /* Intro Header */
+    .intro-header{
+      text-align:center;
+      margin-bottom: 56px;
+      padding: 44px 34px;
+      border-radius: 16px;
+      border: 1px solid rgba(255,255,255,.10);
+      background: linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.015));
+      box-shadow: 0 10px 30px rgba(0,0,0,.35);
+      position: relative;
+      overflow: hidden;
+    }
+    .intro-header::before{
+      content:"";
+      position:absolute;
+      left:0; right:0; top:0;
+      height: 2px;
+      background: linear-gradient(90deg, rgba(45,212,191,.75), rgba(96,165,250,.55), rgba(255,90,95,.75));
+      opacity: .65;
+    }
+
+    .intro-header h1{
+      margin: 0 0 14px;
+      font-size: clamp(2.1rem, 4.6vw, 3rem);
+      letter-spacing: 1px;
+      background: linear-gradient(90deg, var(--accent), rgba(96,165,250,.95), var(--accent-red));
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+    .intro-header p{
+      margin: 0 auto;
+      max-width: 860px;
+      font-size: 1.05rem;
+      color: rgba(230,237,246,.78);
+    }
+    .intro-header strong{
+      color: var(--accent);
+      font-weight: 1000;
+    }
+
+    /* Section Title */
+    .section-title{
+      font-size: 1.7rem;
+      font-weight: 1000;
+      margin: 56px 0 18px;
+      color: var(--text);
+      display:flex;
+      align-items:center;
+      gap:12px;
+    }
+    .section-title::before{
+      content:"";
+      width:10px;
+      height:10px;
+      border-radius:999px;
+      background: var(--accent);
+      box-shadow: 0 0 0 6px rgba(45,212,191,.12), 0 0 0 10px rgba(255,90,95,.06);
+    }
+
+    /* Tech Grid */
+    .tech-grid{
+      display:grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap:12px;
+    }
+    .tech-item{
+      background: rgba(12,18,28,.60);
+      border: 1px solid rgba(255,255,255,.10);
+      border-radius: 14px;
+      padding: 16px 12px;
+      text-align:center;
+      font-weight: 1000;
+      color: rgba(230,237,246,.90);
+      box-shadow: 0 10px 30px rgba(0,0,0,.25);
+      transition: transform .18s ease, border-color .18s ease, box-shadow .18s ease;
+    }
+    .tech-item:hover{
+      transform: translateY(-2px);
+      border-color: rgba(45,212,191,.55);
+      box-shadow:
+        0 0 0 6px rgba(45,212,191,.10),
+        0 0 0 12px rgba(255,90,95,.05),
+        0 16px 40px rgba(0,0,0,.35);
+    }
+
+    /* Awards */
+    .awards-container{
+      margin-top: 10px;
+      background: linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.015));
+      border: 1px solid rgba(255,255,255,.10);
+      border-radius: 16px;
+      padding: 26px;
+      box-shadow: 0 10px 30px rgba(0,0,0,.35);
+      position: relative;
+      overflow: hidden;
+    }
+    .awards-container::before{
+      content:"";
+      position:absolute;
+      left:0; right:0; top:0;
+      height: 2px;
+      background: linear-gradient(90deg, rgba(45,212,191,.75), rgba(255,90,95,.75));
+      opacity: .65;
+    }
+
+    .award-list{
+      list-style:none;
+      padding:0;
+      margin:0;
+      display:flex;
+      flex-direction:column;
+      gap:10px;
+    }
+
+    .award-item{
+      display:flex;
+      align-items:flex-start;
+      gap: 12px;
+
+      background: rgba(12,18,28,.55);
+      border: 1px solid rgba(255,255,255,.08);
+      border-radius: 14px;
+
+      padding: 14px 14px;
+      transition: transform .18s ease, border-color .18s ease, box-shadow .18s ease, background .18s ease;
+    }
+
+    .award-item:hover{
+      transform: translateY(-2px);
+      background: rgba(255,255,255,.03);
+      border-color: rgba(45,212,191,.30);
+      box-shadow: 0 0 0 8px rgba(45,212,191,.05);
+    }
+
+    .award-tag{
+      white-space: nowrap;
+      font-weight: 500;             
+      font-size: .88rem;            
+      letter-spacing: .2px;
+      padding: 6px 10px;
+      border-radius: 999px;
+
+      background: rgba(255,255,255,.03);  
+      border: 1px solid rgba(255,255,255,.10);
+      color: rgba(154,164,178,.92);       
+    }
+
+    .award-title{
+      flex: 1;
+      color: rgba(230,237,246,.88);
+      font-size: .98rem;
+      line-height: 1.6;
+      padding-top: 2px;
+    }
+
+    .award-rank{
+      white-space: nowrap;
+      font-weight: 1000;
+      font-size: .92rem;
+
+      padding: 7px 10px;
+      border-radius: 999px;
+
+      background: linear-gradient(90deg, rgba(45,212,191,.18), rgba(255,90,95,.16));
+      border: 1px solid rgba(255,255,255,.12);
+      color: rgba(230,237,246,.92);
+
+      box-shadow:
+        0 0 0 6px rgba(45,212,191,.08),
+        0 0 0 10px rgba(255,90,95,.04);
+      margin-left: 6px;
+    }
+
+    /* Footer */
+    .footer{
+      text-align:center;
+      padding: 50px 18px;
+      border-top: 1px solid rgba(255,255,255,.08);
+      color: rgba(154,164,178,.80);
+      font-size: .85rem;
+      background: rgba(0,0,0,.10);
+    }
+
+    /* Responsive */
+    @media (max-width: 900px){
+      header{ padding: 12px 4%; }
+      .nav-item > a{ padding: 14px 10px; }
+      .container{ padding: 110px 6% 70px; }
+      .intro-header{ padding: 34px 22px; }
+    }
+
+    @media (max-width: 740px){
+      .nav-menu{ display:none; } /* 필요하면 햄버거로 확장 가능 */
+      .logo-container img{ height: 42px; }
+      .auth-buttons a{ padding: 9px 11px; font-size: .82rem; }
+
+      .award-item{ flex-direction: column; align-items:flex-start; }
+      .award-rank{ margin-left: 0; }
+    }
+  </style>
+</head>
+
+<body>
+  <!--  스크롤해도 헤더 유지: fixed header -->
+  <header>
+    <div class="logo-container">
+      <a href="1.html" aria-label="Go to Home">
+        <img src="securityfact_logo.png" alt="SF Logo" />
+      </a>
+    </div>
+
+    <div class="nav-container">
+      <ul class="nav-menu">
+        <li class="nav-item">
+          <a href="about_intro.html">ABOUT</a>
+          <ul class="dropdown">
+            <li><a href="about_intro.html">동아리 소개</a></li>
+            <li><a href="about_org.html">조직도</a></li>
+            <li><a href="about_history.html">연혁</a></li>
+          </ul>
+        </li>
+
+        <li class="nav-item">
+          <a href="ctf_awards.html">CTF</a>
+          <ul class="dropdown">
+            <li><a href="ctf_awards.html">수상 실적</a></li>
+            <li><a href="ctf_reports.html">Write-up</a></li>
+          </ul>
+        </li>
+
+        <li class="nav-item"><a href="board.html">BOARD</a></li>
+
+        <li class="nav-item">
+          <a href="recruit_notice.html">RECRUIT</a>
+          <ul class="dropdown">
+            <li><a href="recruit_notice.html">모집 공고</a></li>
+            <li><a href="recruit_faq.html">FAQ</a></li>
+          </ul>
+        </li>
+      </ul>
+
+      <div class="auth-buttons">
+        <a href="login.html">로그인</a>
+        <a href="signup.html">회원가입</a>
+      </div>
+    </div>
+  </header>
+
+  <div class="container">
+    <section class="intro-header">
+      <h1>SecurityFACT란?</h1>
+      <p>
+        SecurityFact는 2010년 최초 설립되어 <strong>해킹 및 정보보안</strong>에 열정을 가진<br />
+        건국대학교 학우분들로 이루어진 공과대학 및 컴퓨터공학부 소속 동아리입니다.
+      </p>
+    </section>
+
+    <h2 class="section-title">주요 기술 분야</h2>
+    <div class="tech-grid">
+      <div class="tech-item">Pwnable</div>
+      <div class="tech-item">Web Hacking</div>
+      <div class="tech-item">Reversing</div>
+      <div class="tech-item">Digital Forensic</div>
+      <div class="tech-item">BlockChain Security</div>
+      <div class="tech-item">CS</div>
+    </div>
+
+    <h2 class="section-title">수상 실적 (Awards)</h2>
+    <div class="awards-container">
+      <ul class="award-list">
+        <li class="award-item">
+          <span class="award-tag">BoB 13기</span>
+          <span class="award-title">Whitehat 10</span>
+        </li>
+
+        <li class="award-item">
+          <span class="award-tag">Midnight Flag CTF 2025</span>
+          <span class="award-title">본선 진출</span>
+          <span class="award-rank">Finalist</span>
+        </li>
+
+        <li class="award-item">
+          <span class="award-tag">2025 핵테온 세종</span>
+          <span class="award-title">국제 대학생 사이버보안 경진대회 (beginner, advanced)</span>
+          <span class="award-rank">본선 진출</span>
+        </li>
+
+        <li class="award-item">
+          <span class="award-tag">Forensic Challenge 2024</span>
+          <span class="award-title">Digital Forensic Challenge</span>
+          <span class="award-rank">학생부 3위 (통합 11위)</span>
+        </li>
+
+        <li class="award-item">
+          <span class="award-tag">INCOGNITO 2024 CTF</span>
+          <span class="award-title">동아리 대항전</span>
+          <span class="award-rank">장려상</span>
+        </li>
+
+        <li class="award-item">
+          <span class="award-tag">금융보안 위협분석 대회</span>
+          <span class="award-title">FIESTA 2024</span>
+          <span class="award-rank">3위</span>
+        </li>
+
+        <li class="award-item">
+          <span class="award-tag">사이버공격방어대회</span>
+          <span class="award-title">CCE 2024</span>
+          <span class="award-rank">준우승</span>
+        </li>
+
+        <li class="award-item">
+          <span class="award-tag">제10회 디지털 범인을 찾아라</span>
+          <span class="award-title">디지털 포렌식 경진대회</span>
+          <span class="award-rank">동상</span>
+        </li>
+
+        <li class="award-item">
+          <span class="award-tag">화이트햇 콘테스트 2024</span>
+          <span class="award-title">국방부 주관 보안 경진대회</span>
+          <span class="award-rank">우수상</span>
+        </li>
+
+        <li class="award-item">
+          <span class="award-tag">SCAN</span>
+          <span class="award-title">대학 정보보호 연합회 CTF</span>
+          <span class="award-rank">예선 2위 · 본선 6위</span>
+        </li>
+      </ul>
+    </div>
+  </div>
+
+  <footer class="footer">
+    &copy; 2025 Security Fact. All Rights Reserved. <br />
+    Konkuk University College of Engineering
+  </footer>
+
+  <script>
+    // 드롭다운 클릭 토글 (빠르게 클릭해야 하는 문제 해결)
+    document.addEventListener("DOMContentLoaded", () => {
+      const items = document.querySelectorAll(".nav-item");
+
+      items.forEach((item) => {
+        const dropdown = item.querySelector(".dropdown");
+        const link = item.querySelector(":scope > a");
+        if (!dropdown || !link) return;
+
+        link.addEventListener("click", (e) => {
+          // 상위 메뉴 클릭 시 토글 (상위 페이지로 이동시키고 싶으면 이 줄을 삭제)
+          e.preventDefault();
+
+          const isOpen = item.classList.contains("open");
+          items.forEach(i => i.classList.remove("open"));
+          if (!isOpen) item.classList.add("open");
+        });
+      });
+
+      document.addEventListener("click", (e) => {
+        const inside = e.target.closest(".nav-item");
+        if (!inside) items.forEach(i => i.classList.remove("open"));
+      });
+
+      document.addEventListener("keydown", (e) => {
+        if (e.key === "Escape") items.forEach(i => i.classList.remove("open"));
+      });
+    });
+  </script>
+</body>
+</html>
