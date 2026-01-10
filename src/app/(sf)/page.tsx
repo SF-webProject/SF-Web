@@ -1,5 +1,6 @@
 // src/app/(sf)/page.tsx
 import styles from "./sf.module.css";
+import Image from "next/image";
 
 export default function HomePage() {
   return (
@@ -7,9 +8,12 @@ export default function HomePage() {
       {/* HERO */}
       <section className={styles.hero}>
         <div className={styles.heroImageContainer}>
-          <img
+          <Image
             src="/securityfact_logo_mid.png"
             alt="Hero Icon"
+            fill
+            priority
+            sizes="(max-width: 740px) 180px, 250px"
             className={styles.heroTopImg}
           />
         </div>

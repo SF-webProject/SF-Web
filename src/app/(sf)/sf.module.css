@@ -86,11 +86,15 @@
 
 .heroImageContainer {
   margin-bottom: 10px;
+
+  position: relative;
+  width: min(250px, 70vw);
+
+  aspect-ratio: 1 / 1;
 }
 
 .sfPage .heroTopImg {
-  max-width: 250px;
-  height: auto;
+  object-fit: contain;
   filter: drop-shadow(0 0 15px var(--accent-glow));
 }
 

@@ -5,18 +5,26 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import styles from "./AuthHeader.module.css";
+import Image from "next/image";
 import type React from "react";
 
 export default function AuthHeader() {
+    const pathname = usePathname() ?? "";
+    // pathname이 바뀌면 리마운트 -> openKey가 초기값(null)로 자동 초기화
+    return <AuthHeaderInner key={pathname} />;
+}
+
+function AuthHeaderInner() {
     const headerRef = useRef<HTMLElement | null>(null);
     const [openKey, setOpenKey] = useState<string | null>(null);
-    const pathname = usePathname();
 
-    const toggleDropdown = (key: string, href: string) => (e: React.MouseEvent) => {
+    const toggleDropdown = (key: string, _href: string) => (e: React.MouseEvent) => {
+        void _href; // lint unused 방지
+
         // 1번째 클릭: 드롭다운 열기
         // 2번째 클릭(이미 열려있을 때): 그대로 링크 이동(모바일 UX용)
         if (openKey === key) return; // 링크 이동을 원하면 아래 2줄로 교체
-        // if (openKey === key) { window.location.href = href; return; }
+        // if (openKey === key) { window.location.href = _href; return; }
 
         e.preventDefault();
         setOpenKey((prev) => (prev === key ? null : key));
@@ -45,15 +53,18 @@ export default function AuthHeader() {
         };
     }, []);
 
-    useEffect(() => {
-        setOpenKey(null);
-    }, [pathname]);
-
     return (
         <header ref={headerRef} className={styles.header}>
             <div className={styles.logoContainer}>
-                <Link href="/">
-                    <img src="/securityfact_logo.png" alt="SF Logo" />
+                <Link href="/" className={styles.logoLink} aria-label="SecurityFACT 홈">
+                    <Image
+                        src="/securityfact_logo.png"
+                        alt="SF Logo"
+                        width={843}   // ✅ 원본 비율용(실제 픽셀값에 맞추는 게 제일 안전)
+                        height={460}  // ✅ 원본 비율용
+                        priority
+                        className={styles.logoImg}
+                    />
                 </Link>
             </div>
 
