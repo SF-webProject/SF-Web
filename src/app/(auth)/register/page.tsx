@@ -5,65 +5,77 @@ import Link from "next/link";
 import styles from "../auth.module.css";
 
 export default function RegisterPage() {
-  return (
-    <div className={styles.signupWrap}>
-      <div className={styles.signupCard}>
-        <div className={styles.signupHead}>
-          <h1>JOIN US</h1>
-          <p>SecurityFACT 계정을 생성하세요</p>
+    return (
+        <div className={styles.signupWrap}>
+            <div className={styles.signupCard}>
+                <div className={styles.signupHead}>
+                    <h1>JOIN US</h1>
+                    <p>SecurityFACT 계정을 생성하세요</p>
+                </div>
+
+                <form action="/api/auth/register" method="post" className={styles.form}>
+                    <div className={styles.field}>
+                        <label htmlFor="name">NAME</label>
+                        <input
+                            id="name"
+                            name="name"
+                            className={styles.input}
+                            type="text"
+                            placeholder="이름(또는 닉네임)"
+                            autoComplete="name"
+                        />
+                    </div>
+
+                    <div className={styles.field}>
+                        <label htmlFor="email">EMAIL</label>
+                        <input
+                            id="email"
+                            name="email"
+                            className={styles.input}
+                            type="email"
+                            placeholder="example@security.com"
+                            required
+                        />
+                    </div>
+
+                    <div className={styles.field}>
+                        <label htmlFor="password">PASSWORD</label>
+                        <input
+                            id="password"
+                            name="password"
+                            className={styles.input}
+                            type="password"
+                            placeholder="비밀번호"
+                            required
+                        />
+                    </div>
+
+                    <div className={styles.field}>
+                        <label htmlFor="passwordConfirm">PASSWORD CHECK</label>
+                        <input
+                            id="passwordConfirm"
+                            name="passwordConfirm"
+                            className={styles.input}
+                            type="password"
+                            placeholder="비밀번호 확인"
+                            required
+                        />
+                    </div>
+
+                    <button className={styles.btn} type="submit">
+                        CREATE ACCOUNT
+                    </button>
+                </form>
+
+                <p className={styles.hint}>
+                    가입 신청 후 관리자의 승인을 거쳐<br />
+                    정식 회원으로 활동이 가능합니다.
+                </p>
+
+                <div className={styles.foot}>
+                    이미 계정이 있으신가요? <Link href="/login">로그인</Link>
+                </div>
+            </div>
         </div>
-
-        <form action="/api/auth/register" method="post" className={styles.form}>
-          <div className={styles.field}>
-            <label htmlFor="email">EMAIL</label>
-            <input
-              id="email"
-              name="email"
-              className={styles.input}
-              type="email"
-              placeholder="example@security.com"
-              required
-            />
-          </div>
-
-          <div className={styles.field}>
-            <label htmlFor="password">PASSWORD</label>
-            <input
-              id="password"
-              name="password"
-              className={styles.input}
-              type="password"
-              placeholder="비밀번호"
-              required
-            />
-          </div>
-
-          <div className={styles.field}>
-            <label htmlFor="passwordConfirm">PASSWORD CHECK</label>
-            <input
-              id="passwordConfirm"
-              name="passwordConfirm"
-              className={styles.input}
-              type="password"
-              placeholder="비밀번호 확인"
-              required
-            />
-          </div>
-
-          <button className={styles.btn} type="submit">
-            CREATE ACCOUNT
-          </button>
-        </form>
-
-        <p className={styles.hint}>
-          가입 신청 후 관리자의 승인을 거쳐<br />
-          정식 회원으로 활동이 가능합니다.
-        </p>
-
-        <div className={styles.foot}>
-          이미 계정이 있으신가요? <Link href="/login">로그인</Link>
-        </div>
-      </div>
-    </div>
-  );
+    );
 }
