@@ -13,10 +13,26 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum AccountStatus {
+  PENDING
+  APPROVED
+}
+
+enum UserRole {
+  MEMBER
+  STAFF
+  ADMIN
+}
+
 model User {
   id           String    @id @default(cuid())
   email        String    @unique
   passwordHash String
+
+  name         String?
+  status       AccountStatus @default(PENDING)
+  role         UserRole      @default(MEMBER)
+  approvedAt   DateTime?
 
   createdAt    DateTime  @default(now())
   updatedAt    DateTime  @updatedAt

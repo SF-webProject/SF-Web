@@ -5,6 +5,7 @@ import bcrypt from "bcryptjs";
 
 export async function POST(req: Request) {
   const formData = await req.formData();
+  const name = String(formData.get("name") ?? "").trim();
   const email = String(formData.get("email") ?? "").trim();
   const password = String(formData.get("password") ?? "");
   const passwordConfirm = String(formData.get("passwordConfirm") ?? "");
@@ -24,7 +25,12 @@ export async function POST(req: Request) {
 
   const passwordHash = await bcrypt.hash(password, 10);
   await prisma.user.create({
-    data: { email, passwordHash },
+    data: {
+      email,
+      passwordHash,
+      name: name || null,
+      // status/role은 schema default(PENDING/MEMBER)로 자동 세팅
+    },
   });
 
   // POST 후에는 303으로 GET 전환
