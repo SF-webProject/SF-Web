@@ -1,0 +1,625 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Board | Security Fact</title>
+
+  <style>
+    :root{
+      --bg: #0b0f14;
+      --surface: #0f1623;
+      --surface-2: #0c121c;
+      --text: #e6edf6;
+      --muted: #9aa4b2;
+      --border: rgba(255,255,255,.10);
+
+      --accent: #2dd4bf;         /* teal main */
+      --accent-2: #60a5fa;       /* soft blue */
+      --accent-red: #ff5a5f;     /* soft red sub */
+      --accent-glow: rgba(45,212,191,.18);
+      --red-glow: rgba(255,90,95,.12);
+    }
+
+    *{ box-sizing: border-box; }
+    html, body{ height: 100%; }
+    body{
+      margin: 0;
+      color: var(--text);
+      font-family: 'Pretendard', 'Segoe UI', Roboto, 'Apple SD Gothic Neo', sans-serif;
+      line-height: 1.65;
+
+      background:
+        radial-gradient(1200px 600px at 50% -10%, rgba(96,165,250,.10), transparent 60%),
+        radial-gradient(900px 500px at 10% 20%, rgba(45,212,191,.10), transparent 55%),
+        radial-gradient(900px 500px at 90% 25%, rgba(255,90,95,.06), transparent 55%),
+        var(--bg);
+      background-repeat: no-repeat;
+      background-attachment: scroll;
+    }
+
+    a{ color: inherit; }
+    img{ max-width: 100%; }
+
+    /* =========================
+       Header / Navigation (첫페이지 그대로)
+    ========================= */
+    header{
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 1000;
+
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 5%;
+
+      background: rgba(11,15,20,.78);
+      backdrop-filter: blur(10px);
+
+      background-image: linear-gradient(90deg,
+        rgba(45,212,191,.90),
+        rgba(96,165,250,.70),
+        rgba(255,90,95,.85)
+      );
+      background-repeat: no-repeat;
+      background-size: 100% 2px;
+      background-position: 0 100%;
+
+      border-bottom: 1px solid rgba(255,255,255,.08);
+    }
+
+    .logo-container{
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-height: 52px;
+    }
+    .logo-container img{
+      height: 46px;
+      display: block;
+      filter: drop-shadow(0 0 10px rgba(45,212,191,.08));
+    }
+
+    .nav-container{
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .nav-menu{
+      display: flex;
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      gap: 4px;
+      align-items: center;
+    }
+
+    .nav-item{ position: relative; }
+
+    /* hover 브리지 */
+    .nav-item::after{
+      content:"";
+      position:absolute;
+      left:0; right:0;
+      top: 100%;
+      height: 14px;
+    }
+
+    .nav-item > a{
+      position: relative;
+      z-index: 3;
+
+      display: block;
+      padding: 16px 14px;
+      border-radius: 10px;
+
+      text-decoration: none;
+      font-weight: 900;
+      letter-spacing: .3px;
+      color: rgba(230,237,246,.92);
+
+      transition: background .18s ease, color .18s ease, box-shadow .18s ease;
+    }
+
+    .nav-item:hover > a{
+      background: rgba(255,255,255,.04);
+      color: var(--text);
+      box-shadow: 0 0 0 6px rgba(45,212,191,.06);
+    }
+
+    .nav-item > a::after{
+      content:"";
+      position:absolute;
+      left: 14px;
+      right: 14px;
+      bottom: 10px;
+      height: 2px;
+      border-radius: 999px;
+      background: linear-gradient(90deg, rgba(45,212,191,.85), rgba(255,90,95,.70));
+      opacity: 0;
+      transform: translateY(4px);
+      transition: .18s;
+    }
+    .nav-item:hover > a::after,
+    .nav-item.open > a::after{
+      opacity: .85;
+      transform: translateY(0);
+    }
+
+    .dropdown{
+      position: absolute;
+      top: calc(100% + 10px);
+      left: 0;
+      min-width: 190px;
+
+      list-style: none;
+      margin: 0;
+      padding: 10px 0;
+
+      background: rgba(12,18,28,.92);
+      border: 1px solid rgba(255,255,255,.10);
+      border-radius: 14px;
+      box-shadow: 0 18px 40px rgba(0,0,0,.45);
+      overflow: hidden;
+
+      opacity: 0;
+      visibility: hidden;
+      transform: translateY(-6px);
+      pointer-events: none;
+      transition: opacity .18s ease, transform .18s ease, visibility .18s ease;
+
+      z-index: 2000;
+    }
+
+    .nav-item:hover .dropdown,
+    .nav-item.open .dropdown{
+      opacity: 1;
+      visibility: visible;
+      transform: translateY(0);
+      pointer-events: auto;
+    }
+
+    .dropdown li a{
+      display: block;
+      padding: 13px 16px;
+      text-decoration: none;
+      font-size: .92rem;
+      color: rgba(230,237,246,.75);
+      transition: background .18s ease, color .18s ease;
+    }
+    .dropdown li a:hover{
+      background: rgba(255,255,255,.05);
+      color: var(--accent);
+    }
+
+    .auth-buttons{
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+    .auth-buttons a{
+      white-space: nowrap;
+      text-decoration: none;
+      font-size: .85rem;
+      font-weight: 900;
+
+      padding: 10px 12px;
+      border-radius: 999px;
+
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.02);
+      color: rgba(230,237,246,.90);
+
+      transition: transform .18s ease, border-color .18s ease, box-shadow .18s ease, background .18s ease;
+    }
+    .auth-buttons a:hover{
+      transform: translateY(-1px);
+      border-color: rgba(45,212,191,.55);
+      box-shadow: 0 0 0 8px rgba(45,212,191,.08);
+      background: rgba(255,255,255,.04);
+    }
+
+    /* =========================
+       Page
+    ========================= */
+    main{
+      padding: 120px 10% 90px;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .page-title{
+      text-align: center;
+      margin-bottom: 34px;
+    }
+    .page-title h1{
+      margin: 0 0 10px;
+      font-size: clamp(2.2rem, 5vw, 3.2rem);
+      font-weight: 1000;
+      letter-spacing: 1px;
+
+      background: linear-gradient(90deg, var(--accent), rgba(96,165,250,.95), var(--accent-red));
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+    .page-title p{
+      margin: 0;
+      color: rgba(154,164,178,.92);
+      font-size: 1.05rem;
+    }
+
+    .section-header{
+      display:flex;
+      align-items:flex-end;
+      justify-content: space-between;
+      gap: 14px;
+      margin-top: 30px;
+      padding-bottom: 14px;
+      position: relative;
+    }
+    .section-header::after{
+      content:"";
+      position:absolute;
+      left: 0; right: 0; bottom: 0;
+      height: 1px;
+      background: rgba(255,255,255,.10);
+    }
+    .section-header h2{
+      margin: 0;
+      font-size: 1.3rem;
+      font-weight: 1000;
+      color: rgba(230,237,246,.95);
+    }
+    .section-meta{
+      font-size: .9rem;
+      color: rgba(154,164,178,.92);
+      white-space: nowrap;
+    }
+    .section-meta b{
+      color: var(--accent);
+      font-weight: 1000;
+    }
+
+    .project-grid{
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 18px;
+      margin-top: 22px;
+    }
+
+    .item-card{
+      background: rgba(12,18,28,.55);
+      border: 1px solid rgba(255,255,255,.10);
+      border-radius: 18px;
+      overflow: hidden;
+      cursor: pointer;
+
+      box-shadow: 0 12px 34px rgba(0,0,0,.35);
+      transition: transform .18s ease, border-color .18s ease, box-shadow .18s ease, background .18s ease;
+      position: relative;
+      min-width: 0;
+    }
+
+    .item-card::before{
+      content:"";
+      position:absolute;
+      left:0; right:0; top:0;
+      height:2px;
+      background: linear-gradient(90deg, rgba(45,212,191,.85), rgba(96,165,250,.55), rgba(255,90,95,.85));
+      opacity:.75;
+      z-index: 1;
+    }
+
+    .item-card:hover{
+      transform: translateY(-3px);
+      border-color: rgba(45,212,191,.28);
+      box-shadow:
+        0 0 0 10px rgba(45,212,191,.05),
+        0 18px 44px rgba(0,0,0,.45);
+      background: rgba(255,255,255,.03);
+    }
+
+    .card-image{
+      height: 170px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      position: relative;
+      background:
+        radial-gradient(220px 120px at 30% 20%, rgba(45,212,191,.12), transparent 60%),
+        radial-gradient(260px 140px at 80% 30%, rgba(255,90,95,.08), transparent 60%),
+        rgba(12,18,28,.55);
+      border-bottom: 1px solid rgba(255,255,255,.08);
+      z-index: 0;
+    }
+
+    .img-placeholder{
+      width: 74px;
+      height: 74px;
+      border-radius: 18px;
+      border: 1px solid rgba(255,255,255,.10);
+      background: linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.02));
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      color: rgba(230,237,246,.70);
+      font-weight: 1000;
+      letter-spacing: 1px;
+      box-shadow: 0 0 0 10px rgba(45,212,191,.05);
+    }
+
+    .card-content{
+      padding: 18px 18px 20px;
+      position: relative;
+      z-index: 2;
+      min-width: 0;
+    }
+
+    .card-tag{
+      display:inline-flex;
+      align-items:center;
+      gap: 8px;
+
+      font-size: .82rem;
+      font-weight: 1000;
+      letter-spacing: .6px;
+      color: rgba(230,237,246,.86);
+
+      padding: 7px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.02);
+    }
+    .dot{
+      width: 8px; height: 8px; border-radius: 3px;
+      background: linear-gradient(180deg, rgba(45,212,191,.85), rgba(255,90,95,.65));
+      box-shadow: 0 0 0 6px rgba(45,212,191,.06);
+    }
+
+    .card-title{
+      margin: 12px 0 8px;
+      font-size: 1.08rem;
+      font-weight: 1000;
+      color: rgba(230,237,246,.96);
+      word-break: keep-all;
+      overflow-wrap: anywhere;
+    }
+
+    .card-author{
+      color: rgba(154,164,178,.92);
+      font-size: .92rem;
+    }
+    .card-author b{
+      color: var(--accent);
+      font-weight: 1000;
+    }
+
+    .load-wrap{
+      text-align: center;
+      margin-top: 36px;
+    }
+
+    .load-btn{
+      appearance: none;
+      background: rgba(255,255,255,.02);
+      border: 1px solid rgba(255,255,255,.14);
+      color: rgba(230,237,246,.85);
+      padding: 14px 34px;
+      border-radius: 999px;
+      font-weight: 1000;
+      letter-spacing: .6px;
+      cursor: pointer;
+      transition: transform .18s ease, border-color .18s ease, box-shadow .18s ease, background .18s ease;
+    }
+    .load-btn:hover{
+      transform: translateY(-1px);
+      border-color: rgba(45,212,191,.45);
+      box-shadow: 0 0 0 10px rgba(45,212,191,.06);
+      background: rgba(255,255,255,.04);
+    }
+
+    .footer {
+      text-align: center;
+      padding: 50px 18px;
+      border-top: 1px solid rgba(255,255,255,.08);
+      color: rgba(154,164,178,.80);
+      font-size: .85rem;
+      background: rgba(0,0,0,.10);
+      line-height: 1.8; 
+    }
+   
+    .insta-link {
+      color: rgba(154,164,178,.80); 
+      font-size: 1.5rem;             
+      margin-left: 8px;              
+      vertical-align: middle;        
+      transition: color 0.3s;        
+    }
+    
+    .insta-link:hover {
+      color: #E1306C;                
+    }
+
+    /* Responsive */
+    @media (max-width: 980px){
+      .nav-item > a{ padding: 12px 10px; font-size: .88rem; }
+      .nav-container{ gap: 10px; }
+      .nav-menu{ gap: 2px; }
+      main{ padding: 110px 6% 80px; }
+    }
+
+    @media (max-width: 860px){
+      .auth-buttons{ display: none; }
+    }
+
+    @media (max-width: 740px){
+      .nav-menu{ display:none; }
+      .logo-container img{ height: 42px; }
+      .project-grid{ grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <div class="logo-container">
+      <a href="1.html"> 
+        <img src="securityfact_logo.png" alt="SF Logo" />
+      </a>
+    </div>
+
+    <div class="nav-container">
+      <ul class="nav-menu">
+        <li class="nav-item">
+          <a href="#about">ABOUT</a>
+          <ul class="dropdown">
+            <li><a href="about_intro.html">동아리 소개</a></li>
+            <li><a href="about_org.html">조직도</a></li>
+            <li><a href="about_history.html">연혁</a></li>
+          </ul>
+        </li>
+
+        <li class="nav-item">
+          <a href="#ctf">CTF</a>
+          <ul class="dropdown">
+            <li><a href="ctf_awards.html">수상 실적</a></li>
+            <li><a href="ctf_reports.html">Write-up</a></li>
+          </ul>
+        </li>
+
+        <li class="nav-item"><a href="board.html">BOARD</a></li>
+
+        <li class="nav-item">
+          <a href="recruit_notice.html">RECRUIT</a>
+          <ul class="dropdown">
+            <li><a href="recruit_notice.html">모집 공고</a></li>
+            <li><a href="recruit_faq.html">FAQ</a></li>
+          </ul>
+        </li>
+      </ul>
+
+      <div class="auth-buttons">
+        <a href="login.html">로그인</a>
+        <a href="signup.html">회원가입</a>
+      </div>
+    </div>
+  </header>
+
+  <main id="about">
+    <div class="page-title">
+      <h1>BOARD</h1>
+      <p>프로젝트 / 활동 공유 게시판</p>
+    </div>
+
+    <div class="section-header">
+      <h2>25-2 Project List</h2>
+      <div class="section-meta">총 <b>6</b>개의 프로젝트</div>
+    </div>
+
+    <section class="project-grid" aria-label="Project List">
+      <div class="item-card">
+        <div class="card-image"><div class="img-placeholder">IMAGE</div></div>
+        <div class="card-content">
+          <span class="card-tag"><span class="dot"></span>WEB / DEV</span>
+          <div class="card-title">동아리 웹사이트 제작</div>
+          <div class="card-author">PM. <b>노민영</b></div>
+        </div>
+      </div>
+
+      <div class="item-card">
+        <div class="card-image"><div class="img-placeholder">IMAGE</div></div>
+        <div class="card-content">
+          <span class="card-tag"><span class="dot"></span>REVERSING</span>
+          <div class="card-title">앱 리버싱·분석</div>
+          <div class="card-author">PM. <b>김휘성</b></div>
+        </div>
+      </div>
+
+      <div class="item-card">
+        <div class="card-image"><div class="img-placeholder">IMAGE</div></div>
+        <div class="card-content">
+          <span class="card-tag"><span class="dot"></span>SYSTEM</span>
+          <div class="card-title">Arm TrustZone 격리</div>
+          <div class="card-author">PM. <b>안동기</b></div>
+        </div>
+      </div>
+
+      <div class="item-card">
+        <div class="card-image"><div class="img-placeholder">IMAGE</div></div>
+        <div class="card-content">
+          <span class="card-tag"><span class="dot"></span>AI / SECURITY</span>
+          <div class="card-title">Deepfake Defense</div>
+          <div class="card-author">PM. <b>김가겸</b></div>
+        </div>
+      </div>
+
+      <div class="item-card">
+        <div class="card-image"><div class="img-placeholder">IMAGE</div></div>
+        <div class="card-content">
+          <span class="card-tag"><span class="dot"></span>HONEYPOT</span>
+          <div class="card-title">허니팟(Honeypot) 구축 및 공격 트래픽 분석</div>
+          <div class="card-author">PM. <b>이운희</b></div>
+        </div>
+      </div>
+
+      <div class="item-card">
+        <div class="card-image"><div class="img-placeholder">IMAGE</div></div>
+        <div class="card-content">
+          <span class="card-tag"><span class="dot"></span>EMBEDDED</span>
+          <div class="card-title">임베디드 기기 펌웨어 분석 및 취약점 분석</div>
+          <div class="card-author">PM. <b>김여진</b></div>
+        </div>
+      </div>
+    </section>
+
+    <div class="load-wrap">
+      <button class="load-btn" type="button">LOAD MORE PROJECTS</button>
+    </div>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+    <footer class="footer">
+      &copy; 2025 Security Fact. All Rights Reserved. 
+      
+      <a href="https://www.instagram.com/ku_security.fact" target="_blank" class="insta-link">
+        <i class="fab fa-instagram"></i>
+      </a>
+      
+      <br />
+      Konkuk University College of Engineering
+    </footer>
+  </main>
+
+  <script>
+    // 드롭다운 클릭 토글 (첫페이지 동일)
+    document.addEventListener("DOMContentLoaded", () => {
+      const items = document.querySelectorAll(".nav-item");
+
+      items.forEach((item) => {
+        const dropdown = item.querySelector(".dropdown");
+        const link = item.querySelector(":scope > a");
+        if (!dropdown || !link) return;
+
+        link.addEventListener("click", (e) => {
+          e.preventDefault();
+          const isOpen = item.classList.contains("open");
+          items.forEach(i => i.classList.remove("open"));
+          if (!isOpen) item.classList.add("open");
+        });
+      });
+
+      document.addEventListener("click", (e) => {
+        const inside = e.target.closest(".nav-item");
+        if (!inside) items.forEach(i => i.classList.remove("open"));
+      });
+
+      document.addEventListener("keydown", (e) => {
+        if (e.key === "Escape") items.forEach(i => i.classList.remove("open"));
+      });
+    });
+  </script>
+</body>
+</html>

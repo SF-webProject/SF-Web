@@ -1,0 +1,901 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>일반게시판 | Security Fact</title>
+
+  <style>
+    :root{
+      --bg: #0b0f14;
+      --surface: #0f1623;
+      --surface-2: #0c121c;
+      --text: #e6edf6;
+      --muted: #9aa4b2;
+      --border: rgba(255,255,255,.10);
+
+      --accent: #2dd4bf;         /* teal main */
+      --accent-2: #60a5fa;       /* soft blue */
+      --accent-red: #ff5a5f;     /* soft red sub */
+      --accent-glow: rgba(45,212,191,.18);
+      --red-glow: rgba(255,90,95,.12);
+    }
+
+    *{ box-sizing: border-box; }
+    html, body{ height: 100%; }
+    body{
+      margin: 0;
+      color: var(--text);
+      font-family: 'Pretendard', 'Segoe UI', Roboto, 'Apple SD Gothic Neo', sans-serif;
+      line-height: 1.65;
+
+      background:
+        radial-gradient(1200px 600px at 50% -10%, rgba(96,165,250,.10), transparent 60%),
+        radial-gradient(900px 500px at 10% 20%, rgba(45,212,191,.10), transparent 55%),
+        radial-gradient(900px 500px at 90% 25%, rgba(255,90,95,.06), transparent 55%),
+        var(--bg);
+      background-repeat: no-repeat;
+      background-attachment: scroll;
+    }
+
+    a{ color: inherit; }
+    img{ max-width: 100%; }
+
+
+    header{
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 1000;
+
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 5%;
+
+      background: rgba(11,15,20,.78);
+      backdrop-filter: blur(10px);
+
+      background-image: linear-gradient(90deg,
+        rgba(45,212,191,.90),
+        rgba(96,165,250,.70),
+        rgba(255,90,95,.85)
+      );
+      background-repeat: no-repeat;
+      background-size: 100% 2px;
+      background-position: 0 100%;
+
+      border-bottom: 1px solid rgba(255,255,255,.08);
+    }
+
+    .logo-container{
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-height: 52px;
+    }
+    .logo-container img{
+      height: 46px;
+      display: block;
+      filter: drop-shadow(0 0 10px rgba(45,212,191,.08));
+    }
+
+    .nav-container{
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .nav-menu{
+      display: flex;
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      gap: 4px;
+      align-items: center;
+    }
+
+    .nav-item{ position: relative; }
+
+    
+    .nav-item::after{
+      content:"";
+      position:absolute;
+      left:0; right:0;
+      top: 100%;
+      height: 14px;
+    }
+
+    .nav-item > a{
+      position: relative;
+      z-index: 3;
+
+      display: block;
+      padding: 16px 14px;
+      border-radius: 10px;
+
+      text-decoration: none;
+      font-weight: 900;
+      letter-spacing: .3px;
+      color: rgba(230,237,246,.92);
+
+      transition: background .18s ease, color .18s ease, box-shadow .18s ease;
+    }
+
+    .nav-item:hover > a{
+      background: rgba(255,255,255,.04);
+      color: var(--text);
+      box-shadow: 0 0 0 6px rgba(45,212,191,.06);
+    }
+
+    .nav-item > a::after{
+      content:"";
+      position:absolute;
+      left: 14px;
+      right: 14px;
+      bottom: 10px;
+      height: 2px;
+      border-radius: 999px;
+      background: linear-gradient(90deg, rgba(45,212,191,.85), rgba(255,90,95,.70));
+      opacity: 0;
+      transform: translateY(4px);
+      transition: .18s;
+    }
+    .nav-item:hover > a::after,
+    .nav-item.open > a::after{
+      opacity: .85;
+      transform: translateY(0);
+    }
+
+    .dropdown{
+      position: absolute;
+      top: calc(100% + 10px);
+      left: 0;
+      min-width: 220px;
+
+      list-style: none;
+      margin: 0;
+      padding: 10px 0;
+
+      background: rgba(12,18,28,.92);
+      border: 1px solid rgba(255,255,255,.10);
+      border-radius: 14px;
+      box-shadow: 0 18px 40px rgba(0,0,0,.45);
+      overflow: hidden;
+
+      opacity: 0;
+      visibility: hidden;
+      transform: translateY(-6px);
+      pointer-events: none;
+      transition: opacity .18s ease, transform .18s ease, visibility .18s ease;
+
+      z-index: 2000;
+    }
+
+    .nav-item:hover .dropdown,
+    .nav-item.open .dropdown{
+      opacity: 1;
+      visibility: visible;
+      transform: translateY(0);
+      pointer-events: auto;
+    }
+
+    .dropdown li a{
+      display: block;
+      padding: 13px 16px;
+      text-decoration: none;
+      font-size: .92rem;
+      color: rgba(230,237,246,.75);
+      transition: background .18s ease, color .18s ease;
+    }
+    .dropdown li a:hover{
+      background: rgba(255,255,255,.05);
+      color: var(--accent);
+    }
+
+    .auth-buttons{
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+    .auth-buttons a{
+      white-space: nowrap;
+      text-decoration: none;
+      font-size: .85rem;
+      font-weight: 900;
+
+      padding: 10px 12px;
+      border-radius: 999px;
+
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.02);
+      color: rgba(230,237,246,.90);
+
+      transition: transform .18s ease, border-color .18s ease, box-shadow .18s ease, background .18s ease;
+    }
+    .auth-buttons a:hover{
+      transform: translateY(-1px);
+      border-color: rgba(45,212,191,.55);
+      box-shadow: 0 0 0 8px rgba(45,212,191,.08);
+      background: rgba(255,255,255,.04);
+    }
+
+
+    main{
+      padding: 120px 10% 90px;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .page-title{
+      text-align: center;
+      margin-bottom: 34px;
+    }
+    .page-title h1{
+      margin: 0 0 10px;
+      font-size: clamp(2.2rem, 5vw, 3.2rem);
+      font-weight: 1000;
+      letter-spacing: 1px;
+
+      background: linear-gradient(90deg, var(--accent), rgba(96,165,250,.95), var(--accent-red));
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+    .page-title p{
+      margin: 0;
+      color: rgba(154,164,178,.92);
+      font-size: 1.05rem;
+    }
+
+    .section-header{
+      display:flex;
+      align-items:flex-end;
+      justify-content: space-between;
+      gap: 14px;
+      margin-top: 30px;
+      padding-bottom: 14px;
+      position: relative;
+    }
+    .section-header::after{
+      content:"";
+      position:absolute;
+      left: 0; right: 0; bottom: 0;
+      height: 1px;
+      background: rgba(255,255,255,.10);
+    }
+    .section-header h2{
+      margin: 0;
+      font-size: 1.3rem;
+      font-weight: 1000;
+      color: rgba(230,237,246,.95);
+    }
+    .section-meta{
+      font-size: .9rem;
+      color: rgba(154,164,178,.92);
+      white-space: nowrap;
+    }
+    .section-meta b{
+      color: var(--accent);
+      font-weight: 1000;
+    }
+
+   
+    .grid{
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 18px;
+      margin-top: 22px;
+    }
+
+    .item-card{
+      background: rgba(12,18,28,.55);
+      border: 1px solid rgba(255,255,255,.10);
+      border-radius: 18px;
+      overflow: hidden;
+      cursor: pointer;
+
+      box-shadow: 0 12px 34px rgba(0,0,0,.35);
+      transition: transform .18s ease, border-color .18s ease, box-shadow .18s ease, background .18s ease;
+      position: relative;
+      min-width: 0;
+    }
+
+    .item-card::before{
+      content:"";
+      position:absolute;
+      left:0; right:0; top:0;
+      height:2px;
+      background: linear-gradient(90deg, rgba(45,212,191,.85), rgba(96,165,250,.55), rgba(255,90,95,.85));
+      opacity:.75;
+      z-index: 1;
+    }
+
+    .item-card:hover{
+      transform: translateY(-3px);
+      border-color: rgba(45,212,191,.28);
+      box-shadow:
+        0 0 0 10px rgba(45,212,191,.05),
+        0 18px 44px rgba(0,0,0,.45);
+      background: rgba(255,255,255,.03);
+    }
+
+    .card-image{
+      height: 150px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      position: relative;
+      background:
+        radial-gradient(220px 120px at 30% 20%, rgba(45,212,191,.12), transparent 60%),
+        radial-gradient(260px 140px at 80% 30%, rgba(255,90,95,.08), transparent 60%),
+        rgba(12,18,28,.55);
+      border-bottom: 1px solid rgba(255,255,255,.08);
+      z-index: 0;
+    }
+
+    .img-placeholder{
+      width: 74px;
+      height: 74px;
+      border-radius: 18px;
+      border: 1px solid rgba(255,255,255,.10);
+      background: linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.02));
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      color: rgba(230,237,246,.70);
+      font-weight: 1000;
+      letter-spacing: 1px;
+      box-shadow: 0 0 0 10px rgba(45,212,191,.05);
+    }
+
+    .card-content{
+      padding: 18px 18px 20px;
+      position: relative;
+      z-index: 2;
+      min-width: 0;
+    }
+
+    .card-tag{
+      display:inline-flex;
+      align-items:center;
+      gap: 8px;
+
+      font-size: .82rem;
+      font-weight: 1000;
+      letter-spacing: .6px;
+      color: rgba(230,237,246,.86);
+
+      padding: 7px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.02);
+    }
+    .dot{
+      width: 8px; height: 8px; border-radius: 3px;
+      background: linear-gradient(180deg, rgba(45,212,191,.85), rgba(255,90,95,.65));
+      box-shadow: 0 0 0 6px rgba(45,212,191,.06);
+    }
+
+    .card-title{
+      margin: 12px 0 8px;
+      font-size: 1.08rem;
+      font-weight: 1000;
+      color: rgba(230,237,246,.96);
+      word-break: keep-all;
+      overflow-wrap: anywhere;
+    }
+
+    .card-desc{
+      margin: 0;
+      color: rgba(154,164,178,.92);
+      font-size: .92rem;
+    }
+
+    .card-actions{
+      margin-top: 14px;
+      display:flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .btn{
+      appearance: none;
+      background: rgba(255,255,255,.02);
+      border: 1px solid rgba(255,255,255,.14);
+      color: rgba(230,237,246,.88);
+      padding: 10px 14px;
+      border-radius: 999px;
+      font-weight: 1000;
+      letter-spacing: .35px;
+      cursor: pointer;
+      text-decoration: none;
+      display:inline-flex;
+      align-items:center;
+      gap: 8px;
+      transition: transform .18s ease, border-color .18s ease, box-shadow .18s ease, background .18s ease;
+    }
+    .btn:hover{
+      transform: translateY(-1px);
+      border-color: rgba(45,212,191,.45);
+      box-shadow: 0 0 0 10px rgba(45,212,191,.06);
+      background: rgba(255,255,255,.04);
+    }
+
+    .btn-ghost{
+      border-color: rgba(255,255,255,.10);
+      color: rgba(230,237,246,.80);
+    }
+
+    .board-wrap{
+      background: rgba(12,18,28,.45);
+      border: 1px solid rgba(255,255,255,.10);
+      border-radius: 18px;
+      box-shadow: 0 12px 34px rgba(0,0,0,.35);
+      overflow: hidden;
+      margin-top: 18px;
+    }
+
+    .toolbar{
+      display:flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 16px;
+      border-bottom: 1px solid rgba(255,255,255,.08);
+      background: rgba(255,255,255,.02);
+    }
+
+    .toolbar-left, .toolbar-right{
+      display:flex;
+      gap: 10px;
+      align-items:center;
+      flex-wrap: wrap;
+    }
+
+    .field{
+      display:flex;
+      align-items:center;
+      gap: 10px;
+      padding: 10px 12px;
+      border-radius: 12px;
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.02);
+      min-width: 240px;
+    }
+    .field i{ color: rgba(154,164,178,.92); }
+    .field input{
+      width: 100%;
+      border: 0;
+      outline: none;
+      background: transparent;
+      color: rgba(230,237,246,.92);
+      font-size: .92rem;
+    }
+
+    select.select{
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.02);
+      color: rgba(230,237,246,.90);
+      padding: 10px 12px;
+      border-radius: 12px;
+      outline: none;
+      font-weight: 800;
+      letter-spacing: .2px;
+    }
+
+    .pill{
+      display:inline-flex;
+      align-items:center;
+      gap: 8px;
+      padding: 8px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.02);
+      font-size: .85rem;
+      color: rgba(230,237,246,.84);
+      font-weight: 900;
+      letter-spacing: .2px;
+      white-space: nowrap;
+    }
+    .pill b{ color: var(--accent); }
+
+    .list{
+      width: 100%;
+      border-collapse: collapse;
+    }
+    .list thead th{
+      text-align: left;
+      font-size: .85rem;
+      color: rgba(154,164,178,.92);
+      font-weight: 900;
+      letter-spacing: .3px;
+      padding: 14px 16px;
+      border-bottom: 1px solid rgba(255,255,255,.08);
+      background: rgba(0,0,0,.10);
+    }
+    .list tbody td{
+      padding: 14px 16px;
+      border-bottom: 1px solid rgba(255,255,255,.06);
+      color: rgba(230,237,246,.90);
+      vertical-align: top;
+    }
+    .list tbody tr:hover td{
+      background: rgba(255,255,255,.02);
+    }
+
+    .tag{
+      display:inline-flex;
+      align-items:center;
+      gap: 8px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      font-size: .80rem;
+      font-weight: 1000;
+      letter-spacing: .35px;
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.02);
+      color: rgba(230,237,246,.84);
+      white-space: nowrap;
+    }
+    .tag-pin{
+      border-color: rgba(96,165,250,.32);
+      box-shadow: 0 0 0 8px rgba(96,165,250,.06);
+    }
+    .tag-notice{
+      border-color: rgba(45,212,191,.28);
+      box-shadow: 0 0 0 8px rgba(45,212,191,.05);
+    }
+    .tag-qna{
+      border-color: rgba(255,90,95,.25);
+      box-shadow: 0 0 0 8px rgba(255,90,95,.05);
+    }
+
+    .title-link{
+      text-decoration: none;
+      font-weight: 1000;
+      color: rgba(230,237,246,.96);
+    }
+    .title-link:hover{ color: var(--accent); }
+
+    .subtext{
+      margin-top: 6px;
+      color: rgba(154,164,178,.92);
+      font-size: .90rem;
+      line-height: 1.55;
+    }
+
+    .actions{
+      display:flex;
+      gap: 8px;
+      justify-content: flex-end;
+      flex-wrap: wrap;
+    }
+    .icon-btn{
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.02);
+      color: rgba(230,237,246,.86);
+      padding: 9px 10px;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: transform .18s ease, border-color .18s ease, box-shadow .18s ease, background .18s ease;
+    }
+    .icon-btn:hover{
+      transform: translateY(-1px);
+      border-color: rgba(45,212,191,.45);
+      box-shadow: 0 0 0 10px rgba(45,212,191,.06);
+      background: rgba(255,255,255,.04);
+    }
+    .icon-btn.danger:hover{
+      border-color: rgba(255,90,95,.45);
+      box-shadow: 0 0 0 10px rgba(255,90,95,.06);
+    }
+
+    .empty{
+      padding: 22px 16px;
+      color: rgba(154,164,178,.92);
+      text-align: center;
+    }
+
+    .footer {
+      text-align: center;
+      padding: 50px 18px;
+      border-top: 1px solid rgba(255,255,255,.08);
+      color: rgba(154,164,178,.80);
+      font-size: .85rem;
+      background: rgba(0,0,0,.10);
+      line-height: 1.8; 
+    }
+
+    .insta-link {
+      color: rgba(154,164,178,.80); 
+      font-size: 1.5rem;             
+      margin-left: 8px;              
+      vertical-align: middle;        
+      transition: color 0.3s;        
+    }
+
+    .insta-link:hover { color: #E1306C; }
+
+  
+    @media (max-width: 980px){
+      .nav-item > a{ padding: 12px 10px; font-size: .88rem; }
+      .nav-container{ gap: 10px; }
+      .nav-menu{ gap: 2px; }
+      main{ padding: 110px 6% 80px; }
+      .field{ min-width: 220px; }
+    }
+
+    @media (max-width: 860px){
+      .auth-buttons{ display: none; }
+    }
+
+    @media (max-width: 740px){
+      .nav-menu{ display:none; }
+      .logo-container img{ height: 42px; }
+      .grid{ grid-template-columns: 1fr; }
+      .field{ min-width: 100%; }
+      .toolbar{ align-items: stretch; }
+      .toolbar-left, .toolbar-right{ width: 100%; justify-content: space-between; }
+    }
+  </style>
+
+</head>
+
+<body>
+
+  <header>
+    <div class="logo-container">
+      <a href="1.html">
+        <img src="securityfact_logo.png" alt="SF Logo" />
+      </a>
+    </div>
+
+    <div class="nav-container">
+      <ul class="nav-menu">
+        <li class="nav-item">
+          <a href="#about" data-toggle="dropdown">ABOUT</a>
+          <ul class="dropdown">
+            <li><a href="about_intro.html">동아리 소개</a></li>
+            <li><a href="about_org.html">조직도</a></li>
+            <li><a href="about_history.html">연혁</a></li>
+          </ul>
+        </li>
+
+        <li class="nav-item">
+          <a href="#ctf" data-toggle="dropdown">CTF</a>
+          <ul class="dropdown">
+            <li><a href="ctf_awards.html">수상 실적</a></li>
+            <li><a href="ctf_reports.html">Write-up</a></li>
+          </ul>
+        </li>
+
+        <li class="nav-item">
+          <a href="board.html" data-toggle="dropdown">BOARD</a>
+          <ul class="dropdown">
+            <li><a href="board.html">Board</a></li>
+            <li><a href="board_notice.html">공지사항</a></li>
+            <li><a href="board_resources.html">자료게시판</a></li>
+            <li><a href="board_general.html">일반게시판</a></li>
+          </ul>
+        </li>
+
+        <li class="nav-item">
+          <a href="recruit_notice.html" data-toggle="dropdown">RECRUIT</a>
+          <ul class="dropdown">
+            <li><a href="recruit_notice.html">모집 공고</a></li>
+            <li><a href="recruit_faq.html">FAQ</a></li>
+          </ul>
+        </li>
+      </ul>
+
+      <div class="auth-buttons">
+        <a href="login.html">로그인</a>
+        <a href="signup.html">회원가입</a>
+      </div>
+    </div>
+  </header>
+
+
+  <main>
+    <div class="page-title">
+      <h1>일반게시판</h1>
+      <p>기술 글과 질문 글을 카테고리로 구분하고 검색·필터링합니다.</p>
+    </div>
+
+    <div class="section-header" id="filters">
+      <h2>글 목록</h2>
+      <div class="section-meta">카테고리 필터 · 검색 · 정렬</div>
+    </div>
+
+    <div class="board-wrap">
+      <div class="toolbar">
+        <div class="toolbar-left">
+          <div class="field" title="제목/내용 검색">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            <input id="postSearch" type="text" placeholder="검색 (제목/내용/작성자)" />
+          </div>
+
+          <select id="postCategory" class="select" aria-label="카테고리 필터">
+            <option value="all">전체 카테고리</option>
+            <option value="기술 글">기술 글</option>
+            <option value="질문 글">질문 글</option>
+          </select>
+
+          <select id="postSort" class="select" aria-label="정렬">
+            <option value="new">최신순</option>
+            <option value="old">오래된순</option>
+          </select>
+
+          <span class="pill">권한: <b id="roleLabel">일반</b></span>
+        </div>
+
+        <div class="toolbar-right" id="write">
+          <a class="btn" href="#" id="writeBtn"><i class="fa-solid fa-pen-to-square"></i> 글쓰기</a>
+        </div>
+      </div>
+
+      <table class="list" aria-label="General Posts">
+        <thead>
+          <tr>
+            <th style="width: 160px;">카테고리</th>
+            <th>제목</th>
+            <th style="width: 160px;">작성자</th>
+            <th style="width: 120px;">작성일</th>
+            <th style="width: 130px; text-align:right;">관리</th>
+          </tr>
+        </thead>
+        <tbody id="postBody"></tbody>
+      </table>
+
+      <div class="empty" id="postEmpty" style="display:none;">조건에 맞는 글이 없습니다.</div>
+    </div>
+
+  </main>
+
+  <script>
+    
+    const currentUser = {
+      name: "홍길동",
+      role: "ops"
+    };
+
+    const roleLabel = document.getElementById("roleLabel");
+    roleLabel.textContent = currentUser.role === "admin" ? "관리자" : (currentUser.role === "ops" ? "운영진" : "일반");
+
+    const posts = [
+      { id: 101, category: "기술 글", title: "CVE-2024-XXXX 분석: ", content: " Ubuntu 22.04.", author: "정정정", date: "2026-01-11" },
+      { id: 102, category: "질문 글", title: "이 문제 너무 어렵습니다. 도와주세요", content: "안 먹히는데 원인이 뭘까요?", author: "김김김", date: "2026-01-10" },
+      { id: 103, category: "질문 글", title: "CTF 같이 나가실 분", content: "주말 온라인 CTF 팀원 구합니다. 웹/리버싱 환영.", author: "이이이", date: "2026-01-09" },
+      { id: 104, category: "기술 글", title: "취약점 기술 글 업로드 가이드 ", content: "요약/참고 링크를 포함해주세요.", author: "운영진", date: "2026-01-05" }
+    ];
+
+    document.getElementById("writeBtn").addEventListener("click", (e) => {
+      e.preventDefault();
+      alert("데모 화면입니다. 실제 구현 시 글쓰기/에디터/카테고리 강제/권한 검증을 백엔드와 연동하세요.");
+    });
+
+    function canDelete(post){
+      if (currentUser.role === "admin" || currentUser.role === "ops") return true;
+      return post.author === currentUser.name;
+    }
+
+    function tagForCategory(cat){
+      if (cat === "기술 글") return `<span class="tag tag-notice"><i class="fa-solid fa-code"></i> 기술 글</span>`;
+      return `<span class="tag tag-qna"><i class="fa-solid fa-circle-question"></i> 질문 글</span>`;
+    }
+
+    function render(){
+      const q = (document.getElementById("postSearch").value || "").trim().toLowerCase();
+      const cat = document.getElementById("postCategory").value;
+      const sort = document.getElementById("postSort").value;
+
+      let filtered = posts.filter(p => {
+        if (cat !== "all" && p.category !== cat) return false;
+        if (!q) return true;
+        return (p.title + " " + p.content + " " + p.author).toLowerCase().includes(q);
+      });
+
+      filtered = filtered.slice().sort((a,b) => {
+        if (sort === "new") return b.date.localeCompare(a.date);
+        return a.date.localeCompare(b.date);
+      });
+
+      const tbody = document.getElementById("postBody");
+      tbody.innerHTML = filtered.map(p => {
+        const deleteBtn = canDelete(p)
+          ? `<button class="icon-btn danger" title="삭제" data-id="${p.id}"><i class="fa-solid fa-trash"></i></button>`
+          : `<button class="icon-btn" title="삭제 권한 없음" disabled style="opacity:.4; cursor:not-allowed;"><i class="fa-solid fa-trash"></i></button>`;
+
+        return `
+          <tr>
+            <td>${tagForCategory(p.category)}</td>
+            <td>
+              <a class="title-link" href="#">${p.title}</a>
+              <div class="subtext">${p.content}</div>
+            </td>
+            <td>${p.author}</td>
+            <td>${p.date}</td>
+            <td>
+              <div class="actions">
+                ${deleteBtn}
+              </div>
+            </td>
+          </tr>
+        `;
+      }).join("");
+
+      document.getElementById("postEmpty").style.display = filtered.length ? "none" : "block";
+    }
+
+    document.getElementById("postSearch").addEventListener("input", render);
+    document.getElementById("postCategory").addEventListener("change", render);
+    document.getElementById("postSort").addEventListener("change", render);
+
+    document.addEventListener("click", (e) => {
+      const btn = e.target.closest("button[data-id]");
+      if (!btn) return;
+
+      const id = Number(btn.dataset.id);
+      const idx = posts.findIndex(p => p.id === id);
+      if (idx < 0) return;
+
+      if (!canDelete(posts[idx])) return;
+
+      const ok = confirm("정말로 이 글을 삭제할까요?");
+      if (!ok) return;
+
+      posts.splice(idx, 1);
+      render();
+    });
+
+    render();
+  </script>
+
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <footer class="footer">
+    &copy; 2025 Security Fact. All Rights Reserved.
+    <a href="https://www.instagram.com/ku_security.fact" target="_blank" class="insta-link" rel="noopener">
+      <i class="fab fa-instagram"></i>
+    </a>
+    <br />
+    Konkuk University College of Engineering
+  </footer>
+
+
+  <script>
+    // 드롭다운 클릭 토글 (모바일/터치 대응)
+    document.addEventListener("DOMContentLoaded", () => {
+      const items = document.querySelectorAll(".nav-item");
+
+      items.forEach((item) => {
+        const dropdown = item.querySelector(".dropdown");
+        const link = item.querySelector(":scope > a");
+        if (!dropdown || !link) return;
+
+        // data-toggle="dropdown"인 경우에만 클릭 토글 (기존 링크 이동은 유지)
+        link.addEventListener("click", (e) => {
+          if (link.dataset.toggle !== "dropdown") return;
+          e.preventDefault();
+
+          const isOpen = item.classList.contains("open");
+          items.forEach(i => i.classList.remove("open"));
+          if (!isOpen) item.classList.add("open");
+        });
+      });
+
+      document.addEventListener("click", (e) => {
+        const inside = e.target.closest(".nav-item");
+        if (!inside) items.forEach(i => i.classList.remove("open"));
+      });
+
+      document.addEventListener("keydown", (e) => {
+        if (e.key === "Escape") items.forEach(i => i.classList.remove("open"));
+      });
+    });
+  </script>
+
+
+</body>
+</html>

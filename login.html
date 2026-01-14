@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Login | Security Fact</title>
+
+  <style>
+    :root{
+      --bg: #0b0f14;
+      --surface: #0f1623;
+      --surface-2: #0c121c;
+      --text: #e6edf6;
+      --muted: #9aa4b2;
+      --border: rgba(255,255,255,.10);
+
+      --accent: #2dd4bf;         /* teal main */
+      --accent-2: #60a5fa;       /* soft blue */
+      --accent-red: #ff5a5f;     /* soft red sub */
+      --accent-glow: rgba(45,212,191,.18);
+      --red-glow: rgba(255,90,95,.12);
+    }
+
+    *{ box-sizing: border-box; }
+    html, body{ height: 100%; }
+    body{
+      margin: 0;
+      color: var(--text);
+      font-family: 'Pretendard','Segoe UI', Roboto, 'Apple SD Gothic Neo', sans-serif;
+      line-height: 1.65;
+
+      background:
+        radial-gradient(1200px 600px at 50% -10%, rgba(96,165,250,.10), transparent 60%),
+        radial-gradient(900px 500px at 10% 20%, rgba(45,212,191,.10), transparent 55%),
+        radial-gradient(900px 500px at 90% 25%, rgba(255,90,95,.06), transparent 55%),
+        var(--bg);
+
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 110px 5% 60px; /* 헤더 높이 고려 */
+    }
+
+    a{ color: inherit; text-decoration: none; }
+    img{ max-width: 100%; }
+
+    /* =========================
+       Header / Navigation (첫페이지 동일)
+    ========================= */
+    header{
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 1000;
+
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 5%;
+
+      background: rgba(11,15,20,.78);
+      backdrop-filter: blur(10px);
+
+      background-image: linear-gradient(90deg,
+        rgba(45,212,191,.90),
+        rgba(96,165,250,.70),
+        rgba(255,90,95,.85)
+      );
+      background-repeat: no-repeat;
+      background-size: 100% 2px;
+      background-position: 0 100%;
+
+      border-bottom: 1px solid rgba(255,255,255,.08);
+    }
+
+    .logo-container{
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-height: 52px;
+    }
+    .logo-container img{
+      height: 46px;
+      display: block;
+      filter: drop-shadow(0 0 10px rgba(45,212,191,.08));
+    }
+
+    .nav-container{
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .nav-menu{
+      display: flex;
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      gap: 4px;
+      align-items: center;
+    }
+
+    .nav-item{ position: relative; }
+
+    /* hover 브리지 */
+    .nav-item::after{
+      content:"";
+      position:absolute;
+      left:0; right:0;
+      top: 100%;
+      height: 14px;
+    }
+
+    .nav-item > a{
+      position: relative;
+      z-index: 3;
+
+      display: block;
+      padding: 16px 14px;
+      border-radius: 10px;
+
+      text-decoration: none;
+      font-weight: 900;
+      letter-spacing: .3px;
+      color: rgba(230,237,246,.92);
+
+      transition: background .18s ease, color .18s ease, box-shadow .18s ease;
+    }
+
+    .nav-item:hover > a{
+      background: rgba(255,255,255,.04);
+      color: var(--text);
+      box-shadow: 0 0 0 6px rgba(45,212,191,.06);
+    }
+
+    .nav-item > a::after{
+      content:"";
+      position:absolute;
+      left: 14px;
+      right: 14px;
+      bottom: 10px;
+      height: 2px;
+      border-radius: 999px;
+      background: linear-gradient(90deg, rgba(45,212,191,.85), rgba(255,90,95,.70));
+      opacity: 0;
+      transform: translateY(4px);
+      transition: .18s;
+    }
+    .nav-item:hover > a::after,
+    .nav-item.open > a::after{
+      opacity: .85;
+      transform: translateY(0);
+    }
+
+    .dropdown{
+      position: absolute;
+      top: calc(100% + 10px);
+      left: 0;
+      min-width: 190px;
+
+      list-style: none;
+      margin: 0;
+      padding: 10px 0;
+
+      background: rgba(12,18,28,.92);
+      border: 1px solid rgba(255,255,255,.10);
+      border-radius: 14px;
+      box-shadow: 0 18px 40px rgba(0,0,0,.45);
+      overflow: hidden;
+
+      opacity: 0;
+      visibility: hidden;
+      transform: translateY(-6px);
+      pointer-events: none;
+      transition: opacity .18s ease, transform .18s ease, visibility .18s ease;
+
+      z-index: 2000;
+    }
+
+    .nav-item:hover .dropdown,
+    .nav-item.open .dropdown{
+      opacity: 1;
+      visibility: visible;
+      transform: translateY(0);
+      pointer-events: auto;
+    }
+
+    .dropdown li a{
+      display: block;
+      padding: 13px 16px;
+      text-decoration: none;
+      font-size: .92rem;
+      color: rgba(230,237,246,.75);
+      transition: background .18s ease, color .18s ease;
+    }
+    .dropdown li a:hover{
+      background: rgba(255,255,255,.05);
+      color: var(--accent);
+    }
+
+    .auth-buttons{
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+    .auth-buttons a{
+      white-space: nowrap;
+      text-decoration: none;
+      font-size: .85rem;
+      font-weight: 900;
+
+      padding: 10px 12px;
+      border-radius: 999px;
+
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.02);
+      color: rgba(230,237,246,.90);
+
+      transition: transform .18s ease, border-color .18s ease, box-shadow .18s ease, background .18s ease;
+    }
+    .auth-buttons a:hover{
+      transform: translateY(-1px);
+      border-color: rgba(45,212,191,.55);
+      box-shadow: 0 0 0 8px rgba(45,212,191,.08);
+      background: rgba(255,255,255,.04);
+    }
+
+    /* =========================
+       Login Card
+    ========================= */
+    .login-wrap{
+      width: 100%;
+      max-width: 420px;
+    }
+
+    .login-card{
+      background: linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.015));
+      border: 1px solid rgba(255,255,255,.10);
+      border-radius: 18px;
+      box-shadow: 0 16px 44px rgba(0,0,0,.45);
+      overflow: hidden;
+      position: relative;
+    }
+    .login-card::before{
+      content:"";
+      position:absolute;
+      left:0; right:0; top:0;
+      height: 2px;
+      background: linear-gradient(90deg, rgba(45,212,191,.85), rgba(96,165,250,.55), rgba(255,90,95,.85));
+      opacity:.7;
+    }
+
+    .login-head{
+      padding: 26px 26px 10px;
+      text-align: center;
+    }
+    .login-head h1{
+      margin: 0 0 10px;
+      font-size: 2rem;
+      font-weight: 1000;
+      letter-spacing: 1px;
+      background: linear-gradient(90deg, var(--accent), rgba(96,165,250,.95), var(--accent-red));
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+    .login-head p{
+      margin: 0;
+      color: rgba(154,164,178,.92);
+      font-size: .95rem;
+    }
+
+    form{
+      padding: 18px 26px 26px;
+    }
+
+    .field{
+      margin-bottom: 14px;
+    }
+    .field label{
+      display: block;
+      font-size: .78rem;
+      letter-spacing: .8px;
+      text-transform: uppercase;
+      color: rgba(154,164,178,.92);
+      margin-bottom: 8px;
+      font-weight: 900;
+    }
+
+    .input{
+      width: 100%;
+      background: rgba(12,18,28,.65);
+      border: 1px solid rgba(255,255,255,.12);
+      color: rgba(230,237,246,.95);
+      padding: 12px 12px;
+      border-radius: 12px;
+      outline: none;
+      transition: border-color .18s ease, box-shadow .18s ease, background .18s ease;
+    }
+    .input::placeholder{
+      color: rgba(154,164,178,.70);
+    }
+    .input:focus{
+      border-color: rgba(45,212,191,.55);
+      box-shadow: 0 0 0 8px rgba(45,212,191,.08);
+      background: rgba(255,255,255,.03);
+    }
+
+    .row{
+      display:flex;
+      justify-content: space-between;
+      align-items:center;
+      gap: 12px;
+      margin: 8px 0 16px;
+      color: rgba(154,164,178,.92);
+      font-size: .9rem;
+    }
+
+    .check{
+      display:flex;
+      align-items:center;
+      gap: 8px;
+      user-select:none;
+    }
+    .check input{
+      width: 16px; height: 16px;
+      accent-color: var(--accent);
+    }
+
+    .link{
+      color: rgba(154,164,178,.92);
+      text-decoration: none;
+      font-weight: 900;
+      transition: color .18s ease;
+      white-space: nowrap;
+    }
+    .link:hover{ color: var(--accent); }
+
+    .btn{
+      width: 100%;
+      border: 0;
+      cursor: pointer;
+
+      padding: 13px 14px;
+      border-radius: 999px;
+      font-weight: 1000;
+      letter-spacing: .6px;
+
+      color: #081018;
+      background: linear-gradient(90deg, rgba(45,212,191,.95), rgba(96,165,250,.85), rgba(255,90,95,.92));
+      box-shadow:
+        0 12px 30px rgba(0,0,0,.35),
+        0 0 0 6px rgba(45,212,191,.10),
+        0 0 0 12px rgba(255,90,95,.06);
+      transition: transform .18s ease, filter .18s ease;
+    }
+    .btn:hover{
+      transform: translateY(-1px);
+      filter: brightness(1.03);
+    }
+
+    .foot{
+      padding: 18px 26px 24px;
+      border-top: 1px solid rgba(255,255,255,.08);
+      color: rgba(154,164,178,.92);
+      font-size: .92rem;
+      text-align: center;
+      background: rgba(0,0,0,.10);
+    }
+    .foot a{
+      color: rgba(230,237,246,.86);
+      font-weight: 1000;
+      text-decoration: none;
+      transition: color .18s ease;
+    }
+    .foot a:hover{ color: var(--accent); }
+
+    /* Responsive */
+    @media (max-width: 980px){
+      .nav-item > a{ padding: 12px 10px; font-size: .88rem; }
+      .nav-container{ gap: 10px; }
+      .nav-menu{ gap: 2px; }
+    }
+    @media (max-width: 860px){
+      .auth-buttons{ display: none; }
+    }
+    @media (max-width: 740px){
+      .nav-menu{ display:none; }
+      .logo-container img{ height: 42px; }
+      body{ padding: 100px 5% 50px; }
+      .login-head h1{ font-size: 1.8rem; }
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <div class="logo-container">
+      <a href="1.html"> 
+        <img src="securityfact_logo.png" alt="SF Logo" />
+      </a>
+    </div>
+
+    <div class="nav-container">
+      <ul class="nav-menu">
+        <li class="nav-item">
+          <a href="index.html#about">ABOUT</a>
+          <ul class="dropdown">
+            <li><a href="about_intro.html">동아리 소개</a></li>
+            <li><a href="about_org.html">조직도</a></li>
+            <li><a href="about_history.html">연혁</a></li>
+          </ul>
+        </li>
+
+        <li class="nav-item">
+          <a href="index.html#ctf">CTF</a>
+          <ul class="dropdown">
+            <li><a href="ctf_awards.html">수상 실적</a></li>
+            <li><a href="ctf_reports.html">Write-up</a></li>
+          </ul>
+        </li>
+
+        <li class="nav-item"><a href="board.html">BOARD</a></li>
+
+        <li class="nav-item">
+          <a href="recruit_notice.html">RECRUIT</a>
+          <ul class="dropdown">
+            <li><a href="recruit_notice.html">모집 공고</a></li>
+            <li><a href="recruit_faq.html">FAQ</a></li>
+          </ul>
+        </li>
+      </ul>
+
+      <div class="auth-buttons">
+        <a href="login.html">로그인</a>
+        <a href="signup.html">회원가입</a>
+      </div>
+    </div>
+  </header>
+
+  <div class="login-wrap">
+    <div class="login-card">
+      <div class="login-head">
+        <h1>LOGIN</h1>
+        <p>SecurityFACT 계정으로 로그인하세요</p>
+      </div>
+
+      <form action="#" method="post">
+        <div class="field">
+          <label for="id">ID / EMAIL</label>
+          <input id="id" class="input" type="text" placeholder="아이디 또는 이메일을 입력하세요" />
+        </div>
+
+        <div class="field">
+          <label for="pw">PASSWORD</label>
+          <input id="pw" class="input" type="password" placeholder="비밀번호를 입력하세요" />
+        </div>
+
+        <div class="row">
+          <label class="check">
+            <input type="checkbox" />
+            로그인 유지
+          </label>
+          <a class="link" href="#">비밀번호 찾기</a>
+        </div>
+
+        <button class="btn" type="submit">SIGN IN</button>
+      </form>
+
+      <div class="foot">
+        아직 계정이 없나요?
+        <a href="signup.html">회원가입</a>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // 드롭다운 클릭 토글 (첫페이지 동일)
+    document.addEventListener("DOMContentLoaded", () => {
+      const items = document.querySelectorAll(".nav-item");
+
+      items.forEach((item) => {
+        const dropdown = item.querySelector(".dropdown");
+        const link = item.querySelector(":scope > a");
+        if (!dropdown || !link) return;
+
+        link.addEventListener("click", (e) => {
+          e.preventDefault();
+          const isOpen = item.classList.contains("open");
+          items.forEach(i => i.classList.remove("open"));
+          if (!isOpen) item.classList.add("open");
+        });
+      });
+
+      document.addEventListener("click", (e) => {
+        const inside = e.target.closest(".nav-item");
+        if (!inside) items.forEach(i => i.classList.remove("open"));
+      });
+
+      document.addEventListener("keydown", (e) => {
+        if (e.key === "Escape") items.forEach(i => i.classList.remove("open"));
+      });
+    });
+  </script>
+</body>
+</html>
