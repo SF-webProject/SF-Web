@@ -3,6 +3,18 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getCurrentUser } from "@/lib/auth";
 
+type Post = {
+  id: number;
+  title: string;
+  content: string;
+  category: "TECH" | "QNA" | "NONE";
+  createdAt: Date;
+  author: {
+    name: string | null;
+    email: string;
+  };
+};
+
 
 export async function GET() {
   try {
@@ -28,7 +40,7 @@ export async function GET() {
       },
     });
 
-    const result = posts.map((p) => ({
+    const result = posts.map((p : Post) => ({
       id: p.id,
       title: p.title,
       content: p.content,
