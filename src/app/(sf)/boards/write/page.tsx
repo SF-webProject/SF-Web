@@ -28,10 +28,14 @@ export default function BoardWritePage() {
         if (!["MEMBER", "STAFF", "ADMIN"].includes(user.role)) throw new Error("권한 없음");
 
         setLoadingAuth(false);
-      } catch (err: any) {
-        alert(err.message || "인증 오류");
-        router.replace("/login");
-      }
+      } catch (err: unknown) {
+         if (err instanceof Error) {
+         alert(err.message);
+         } else {
+            alert("인증 오류");
+         }
+  router.replace("/login");
+}
     })();
   }, [router]);
 
