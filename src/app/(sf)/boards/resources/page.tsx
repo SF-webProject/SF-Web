@@ -58,9 +58,7 @@ export default function BoardResourcesPage() {
     const user = me?.ok ? me.user : null;
     const isApproved = user?.status === "APPROVED";
 
-    // 일단 자료 업로드는 운영진/관리자만 허용
-    const canUpload = !!user && isApproved && (user.role === "ADMIN" || user.role === "STAFF");
-
+    // Hook은 조기 return보다 위에서 항상 호출
     const filtered = useMemo(() => {
         const q = search.trim().toLowerCase();
         return resources.filter((r) => {
@@ -70,35 +68,52 @@ export default function BoardResourcesPage() {
         });
     }, [resources, search, type]);
 
+    // 일단 자료 업로드는 운영진/관리자만 허용
+    const canUpload = !!user && isApproved && (user.role === "ADMIN" || user.role === "STAFF");
+
+    // 로딩 중에 보호된 목록을 렌더하지 않아서 깜빡임 제거
+    if (loadingMe) {
+        return (
+            <main className={styles.main}>
+                <div className={styles.pageTitle}>
+                    <h1 className={styles.pageTitleH1}>자료게시판</h1>
+                    <p className={styles.pageTitleP}>권한 확인 중...</p>
+                </div>
+            </main>
+        );
+    }
+
+    // 로딩 완료 후: 로그인/승인 여부로 차단
+    if (!user) {
+        return (
+            <main className={styles.main}>
+                <div className={styles.pageTitle}>
+                    <h1 className={styles.pageTitleH1}>자료게시판</h1>
+                    <p className={styles.pageTitleP}>이 페이지는 로그인 후 이용 가능합니다.</p>
+                </div>
+            </main>
+        );
+    }
+
+    if (user.status !== "APPROVED") {
+        return (
+            <main className={styles.main}>
+                <div className={styles.pageTitle}>
+                    <h1 className={styles.pageTitleH1}>자료게시판</h1>
+                    <p className={styles.pageTitleP}>
+                        승인된 계정만 게시판을 열람할 수 있습니다. (현재: {user.status})
+                    </p>
+                </div>
+            </main>
+        );
+    }
+
     const iconByType = (t: ResourceType) => {
         if (t === "지원서") return "fa-file-signature";
         if (t === "프로젝트") return "fa-file-zipper";
         if (t === "OT") return "fa-file-pdf";
         return "fa-file-powerpoint";
     };
-
-    if (!loadingMe) {
-        if (!user) {
-            return (
-                <main className={styles.main}>
-                    <div className={styles.pageTitle}>
-                        <h1 className={styles.pageTitleH1}>자료게시판</h1>
-                        <p className={styles.pageTitleP}>이 페이지는 로그인 후 이용 가능합니다.</p>
-                    </div>
-                </main>
-            );
-        }
-        if (user.status !== "APPROVED") {
-            return (
-                <main className={styles.main}>
-                    <div className={styles.pageTitle}>
-                        <h1 className={styles.pageTitleH1}>자료게시판</h1>
-                        <p className={styles.pageTitleP}>승인된 계정만 게시판을 열람할 수 있습니다. (현재: {user.status})</p>
-                    </div>
-                </main>
-            );
-        }
-    }
 
     return (
         <main className={styles.main}>

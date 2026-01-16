@@ -89,6 +89,7 @@ export default function BoardNoticePage() {
 
     const user = me?.ok ? me.user : null;
 
+    // Hook들은 조기 return보다 위에서 항상 호출
     const roleLabel = useMemo(() => {
         if (!user) return "비로그인";
         if (user.role === "ADMIN") return "관리자";
@@ -99,24 +100,61 @@ export default function BoardNoticePage() {
     const isApproved = user?.status === "APPROVED";
     const canWriteNotice = !!user && isApproved && (user.role === "ADMIN" || user.role === "STAFF");
 
+    const pinnedFiltered = useMemo(() => {
+        const qq = q.trim().toLowerCase();
+        if (!qq) return pinnedNotices;
+        return pinnedNotices.filter((n) => (n.title + " " + n.content).toLowerCase().includes(qq));
+    }, [pinnedNotices, q]);
+
+    const noticesFiltered = useMemo(() => {
+        const qq = q.trim().toLowerCase();
+        if (!qq) return notices;
+        return notices.filter((n) => (n.title + " " + n.content).toLowerCase().includes(qq));
+    }, [notices, q]);
+
+    // 로딩 중: 보호된 목록 렌더 방지. 깜빡임 제거
+    if (loadingMe) {
+        return (
+            <main className={styles.main}>
+                <div className={styles.pageTitle}>
+                    <h1 className={styles.pageTitleH1}>공지사항</h1>
+                    <p className={styles.pageTitleP}>권한 확인 중...</p>
+                </div>
+            </main>
+        );
+    }
+
+    // 로딩 완료 후: 로그인/승인 여부로 차단
+    if (!user) {
+        return (
+            <main className={styles.main}>
+                <div className={styles.pageTitle}>
+                    <h1 className={styles.pageTitleH1}>공지사항</h1>
+                    <p className={styles.pageTitleP}>이 페이지는 로그인 후 이용 가능합니다.</p>
+                </div>
+            </main>
+        );
+    }
+
+    if (user.status !== "APPROVED") {
+        return (
+            <main className={styles.main}>
+                <div className={styles.pageTitle}>
+                    <h1 className={styles.pageTitleH1}>공지사항</h1>
+                    <p className={styles.pageTitleP}>
+                        승인된 계정만 게시판을 열람할 수 있습니다. (현재: {user.status})
+                    </p>
+                </div>
+            </main>
+        );
+    }
+
     const canDelete = (post: Notice) => {
         if (!user || !isApproved) return false;
         if (user.role === "ADMIN" || user.role === "STAFF") return true;
         const myName = user.name ?? user.email;
         return post.author === myName;
     };
-
-    const qq = q.trim().toLowerCase();
-
-    const pinnedFiltered = useMemo(() => {
-        if (!qq) return pinnedNotices;
-        return pinnedNotices.filter((n) => (n.title + " " + n.content).toLowerCase().includes(qq));
-    }, [pinnedNotices, qq]);
-
-    const noticesFiltered = useMemo(() => {
-        if (!qq) return notices;
-        return notices.filter((n) => (n.title + " " + n.content).toLowerCase().includes(qq));
-    }, [notices, qq]);
 
     const onDelete = (id: number, pinned: boolean) => {
         const list = pinned ? pinnedNotices : notices;
@@ -130,29 +168,6 @@ export default function BoardNoticePage() {
         if (pinned) setPinnedNotices((prev) => prev.filter((x) => x.id !== id));
         else setNotices((prev) => prev.filter((x) => x.id !== id));
     };
-
-    if (!loadingMe) {
-        if (!user) {
-            return (
-                <main className={styles.main}>
-                    <div className={styles.pageTitle}>
-                        <h1 className={styles.pageTitleH1}>공지사항</h1>
-                        <p className={styles.pageTitleP}>이 페이지는 로그인 후 이용 가능합니다.</p>
-                    </div>
-                </main>
-            );
-        }
-        if (user.status !== "APPROVED") {
-            return (
-                <main className={styles.main}>
-                    <div className={styles.pageTitle}>
-                        <h1 className={styles.pageTitleH1}>공지사항</h1>
-                        <p className={styles.pageTitleP}>승인된 계정만 게시판을 열람할 수 있습니다. (현재: {user.status})</p>
-                    </div>
-                </main>
-            );
-        }
-    }
 
     return (
         <main className={styles.main}>
