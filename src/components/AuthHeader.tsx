@@ -162,9 +162,24 @@ function AuthHeaderInner() {
                         </ul>
                     </li>
 
-                    <li className={styles.navItem}>
-                        <Link href="/boards">BOARD</Link>
+                    <li className={`${styles.navItem} ${openKey === "boards" ? styles.open : ""}`}>
+                        <Link href="/boards" onClick={toggleDropdown("boards", "/boards")}>
+                            BOARD
+                        </Link>
+
+                        <ul className={styles.dropdown}>
+                            <li>
+                                <Link href="/boards/notice">공지사항</Link>
+                            </li>
+                            <li>
+                                <Link href="/boards/resources">자료게시판</Link>
+                            </li>
+                            <li>
+                                <Link href="/boards/general">일반게시판</Link>
+                            </li>
+                        </ul>
                     </li>
+
 
                     <li
                         className={`${styles.navItem} ${openKey === "recruit" ? styles.open : ""
