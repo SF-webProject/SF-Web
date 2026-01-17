@@ -3,6 +3,8 @@
 
 import { useEffect, useMemo, useState } from "react";
 import styles from "../boards.module.css";
+import { useRouter } from "next/navigation";
+
 
 type Me = {
     ok: boolean;
@@ -32,12 +34,11 @@ export default function BoardGeneralPage() {
     const [category, setCategory] = useState<"all" | Post["category"]>("all");
     const [sort, setSort] = useState<"new" | "old">("new");
 
-    const [posts, setPosts] = useState<Post[]>([
-        { id: 101, category: "기술 글", title: "CVE-2024-XXXX 분석:", content: "Ubuntu 22.04.", author: "정정정", date: "2026-01-11" },
-        { id: 102, category: "질문 글", title: "이 문제 너무 어렵습니다. 도와주세요", content: "안 먹히는데 원인이 뭘까요?", author: "김김김", date: "2026-01-10" },
-        { id: 103, category: "질문 글", title: "CTF 같이 나가실 분", content: "주말 온라인 CTF 팀원 구합니다. 웹/리버싱 환영.", author: "이이이", date: "2026-01-09" },
-        { id: 104, category: "기술 글", title: "취약점 기술 글 업로드 가이드", content: "요약/참고 링크를 포함해주세요.", author: "운영진", date: "2026-01-05" },
-    ]);
+  
+    const [posts, setPosts] = useState<Post[]>([]);
+    const router = useRouter();
+    
+
 
     useEffect(() => {
         (async () => {
@@ -54,6 +55,29 @@ export default function BoardGeneralPage() {
             }
         })();
     }, []);
+
+    useEffect(() => {
+         if (!me?.ok) return;
+         if (me.user?.status !== "APPROVED") return;
+
+            (async () => {
+             const res = await fetch("/api/auth/boards/general", {
+             cache: "no-store",
+             });
+
+        if (!res.ok) {
+            console.error("게시글 불러오기 실패");
+             return;
+            }
+
+            const data = await res.json();
+
+         if (data.ok) {
+             setPosts(data.posts);
+             }
+             })();
+        }, [me]);
+        
 
     const user = me?.ok ? me.user : null;
     const isApproved = user?.status === "APPROVED";
@@ -187,18 +211,19 @@ export default function BoardGeneralPage() {
                             권한: <b className={styles.pillStrong}>{roleLabel}</b>
                         </span>
                     </div>
-
                     <div className={styles.toolbarRight} id="write">
                         <button
-                            className={styles.btn}
-                            onClick={() => alert("데모 화면입니다. 실제 구현 시 글쓰기/에디터/카테고리 강제/권한 검증을 백엔드와 연동하세요.")}
-                            disabled={!canWrite}
-                            style={!canWrite ? { opacity: 0.5, cursor: "not-allowed" } : undefined}
-                            type="button"
+                         className={styles.btn}
+                        onClick={() => router.push("/boards/write")}
+                         disabled={!canWrite}
+                         style={!canWrite ? { opacity: 0.5, cursor: "not-allowed" } : undefined}
+                         type="button"
                         >
                             <i className="fa-solid fa-pen-to-square" /> 글쓰기
-                        </button>
+                         </button>
                     </div>
+
+
                 </div>
 
                 <table className={styles.list} aria-label="General Posts">

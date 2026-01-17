@@ -24,6 +24,18 @@ enum UserRole {
   ADMIN
 }
 
+enum BoardType {
+  NOTICE   // 공지사항
+  RESOURCE // 자료게시판
+  GENERAL  // 일반게시판
+}
+
+enum PostCategory {
+  TECH     // 기술 글
+  QNA      // 질문 글
+  NONE     // 공지/자료용
+}
+
 model User {
   id           String    @id @default(cuid())
   email        String    @unique
@@ -38,6 +50,7 @@ model User {
   updatedAt    DateTime  @updatedAt
 
   sessions     Session[]
+  posts        Post[] 
 
   @@map("users")
 }
@@ -53,4 +66,26 @@ model Session {
 
   @@index([userId])
   @@map("sessions")
+}
+
+model Post {
+  id        Int      @id @default(autoincrement())
+
+  board     BoardType
+  category  PostCategory
+
+  title     String
+  content   String
+
+  authorId  String
+  author    User     @relation(fields: [authorId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([board])
+  @@index([category])
+  @@index([createdAt])
+
+  @@map("posts")
 }
