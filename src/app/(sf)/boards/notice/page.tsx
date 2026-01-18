@@ -4,6 +4,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import styles from "../boards.module.css";
+import { useRouter } from "next/navigation";
 
 type Me = {
     ok: boolean;
@@ -29,47 +30,14 @@ type Notice = {
 export default function BoardNoticePage() {
     const [me, setMe] = useState<Me | null>(null);
     const [loadingMe, setLoadingMe] = useState(true);
+    const [loadingPosts, setLoadingPosts] = useState(true);
     const [q, setQ] = useState("");
+    const router = useRouter();
+    
 
-    const [pinnedNotices, setPinnedNotices] = useState<Notice[]>([
-        {
-            id: 1,
-            type: "규칙",
-            title: "게시판 이용 규칙 (필독)",
-            content: "욕설/비방/불법자료 업로드 금지. 기술 글은 출처/재현환경을 명시해주세요.",
-            author: "운영진",
-            date: "2026-01-02",
-            pinned: true,
-        },
-        {
-            id: 2,
-            type: "시스템",
-            title: "계정/권한 정책 안내",
-            content: "운영진/관리자는 모든 게시글 삭제 권한이 있습니다. 본인 글은 본인이 삭제할 수 있습니다.",
-            author: "관리자",
-            date: "2026-01-03",
-            pinned: true,
-        },
-    ]);
+    const [pinnedNotices, setPinnedNotices] = useState<Notice[]>([]);
 
-    const [notices, setNotices] = useState<Notice[]>([
-        {
-            id: 11,
-            type: "모집",
-            title: "25-2 신입 부원 모집 공고",
-            content: "지원서 제출: 2/10(화) 23:59까지. 면접: 2/15(일) 예정.",
-            author: "운영진",
-            date: "2026-01-08",
-        },
-        {
-            id: 12,
-            type: "안내",
-            title: "OT 일정 및 장소 안내",
-            content: "OT: 2/20(금) 19:00, 공학관 3층 세미나실.",
-            author: "운영진",
-            date: "2026-01-10",
-        },
-    ]);
+    const [notices, setNotices] = useState<Notice[]>([]);
 
     useEffect(() => {
         (async () => {
@@ -86,6 +54,30 @@ export default function BoardNoticePage() {
             }
         })();
     }, []);
+
+    useEffect(() => {
+         if (!me?.ok) return;
+
+        (async () => {
+            try {
+            const res = await fetch("/api/auth/boards/notice", { cache: "no-store",});
+
+        if (!res.ok) return;
+
+         const data = await res.json();
+        if (!data.ok) return;
+
+        const pinned = data.posts.filter((p: Notice) => p.pinned);
+         const normal = data.posts.filter((p: Notice) => !p.pinned);
+
+        setPinnedNotices(pinned);
+        setNotices(normal);
+        } finally {
+        setLoadingPosts(false);
+    }
+  })();
+}, [me]);
+
 
     const user = me?.ok ? me.user : null;
 
@@ -186,7 +178,7 @@ export default function BoardNoticePage() {
                     <div className={styles.toolbarRight}>
                         <button
                             className={styles.btn}
-                            onClick={() => alert("데모 화면입니다. 실제 구현 시 글쓰기/권한 검증을 백엔드와 연동하세요.")}
+                            onClick={() => router.push("/boards/notice/write")}
                             disabled={!canWriteNotice}
                             style={!canWriteNotice ? { opacity: 0.5, cursor: "not-allowed" } : undefined}
                             type="button"
