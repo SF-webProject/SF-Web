@@ -1,4 +1,4 @@
-// src/app/api/boards/general/route.ts
+// src/app/api/auth/boards/general/route.ts
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getCurrentUser } from "@/lib/auth";
@@ -104,6 +104,49 @@ export async function POST(req: Request) {
         date: newPost.createdAt.toISOString().slice(0, 10),
       },
     });
+  } catch (err) {
+    console.error(err);
+    return NextResponse.json({ ok: false, message: "서버 오류" }, { status: 500 });
+  }
+}
+
+export async function DELETE(req: Request) {
+  try {
+    const user = await getCurrentUser();
+
+    if (!user)
+      return NextResponse.json({ ok: false, message: "로그인이 필요합니다." }, { status: 401 });
+    if (user.status !== "APPROVED")
+      return NextResponse.json({ ok: false, message: "승인된 사용자만 삭제할 수 있습니다." }, { status: 403 });
+    if (!["MEMBER", "STAFF", "ADMIN"].includes(user.role))
+      return NextResponse.json({ ok: false, message: "삭제 권한이 없습니다." }, { status: 403 });
+
+    const body = await req.json().catch(() => ({}));
+    const id = Number(body.id);
+
+    if (!id || Number.isNaN(id)) {
+      return NextResponse.json({ ok: false, message: "유효하지 않은 id 입니다." }, { status: 400 });
+    }
+
+    // 대상 글 조회(권한 확인용)
+    const post = await prisma.post.findFirst({
+      where: { id, board: "GENERAL" },
+      select: { id: true, authorId: true },
+    });
+
+    if (!post) {
+      return NextResponse.json({ ok: false, message: "게시글을 찾을 수 없습니다." }, { status: 404 });
+    }
+
+    // 권한: 운영진/관리자 전부 가능, 일반은 본인 글만
+    const isStaff = user.role === "STAFF" || user.role === "ADMIN";
+    if (!isStaff && post.authorId !== user.id) {
+      return NextResponse.json({ ok: false, message: "삭제 권한이 없습니다." }, { status: 403 });
+    }
+
+    await prisma.post.delete({ where: { id: post.id } });
+
+    return NextResponse.json({ ok: true });
   } catch (err) {
     console.error(err);
     return NextResponse.json({ ok: false, message: "서버 오류" }, { status: 500 });

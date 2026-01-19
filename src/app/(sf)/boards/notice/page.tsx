@@ -33,7 +33,7 @@ export default function BoardNoticePage() {
     const [loadingPosts, setLoadingPosts] = useState(true);
     const [q, setQ] = useState("");
     const router = useRouter();
-    
+
 
     const [pinnedNotices, setPinnedNotices] = useState<Notice[]>([]);
 
@@ -56,27 +56,27 @@ export default function BoardNoticePage() {
     }, []);
 
     useEffect(() => {
-         if (!me?.ok) return;
+        if (!me?.ok) return;
 
         (async () => {
             try {
-            const res = await fetch("/api/auth/boards/notice", { cache: "no-store",});
+                const res = await fetch("/api/auth/boards/notice", { cache: "no-store", });
 
-        if (!res.ok) return;
+                if (!res.ok) return;
 
-         const data = await res.json();
-        if (!data.ok) return;
+                const data = await res.json();
+                if (!data.ok) return;
 
-        const pinned = data.posts.filter((p: Notice) => p.pinned);
-         const normal = data.posts.filter((p: Notice) => !p.pinned);
+                const pinned = data.posts.filter((p: Notice) => p.pinned);
+                const normal = data.posts.filter((p: Notice) => !p.pinned);
 
-        setPinnedNotices(pinned);
-        setNotices(normal);
-        } finally {
-        setLoadingPosts(false);
-    }
-  })();
-}, [me]);
+                setPinnedNotices(pinned);
+                setNotices(normal);
+            } finally {
+                setLoadingPosts(false);
+            }
+        })();
+    }, [me]);
 
 
     const user = me?.ok ? me.user : null;
@@ -110,7 +110,7 @@ export default function BoardNoticePage() {
         return notices.filter((n) => (n.title + " " + n.content).toLowerCase().includes(qq));
     }, [notices, qq]);
 
-    const onDelete = (id: number, pinned: boolean) => {
+    const onDelete = async (id: number, pinned: boolean) => {
         const list = pinned ? pinnedNotices : notices;
         const target = list.find((x) => x.id === id);
         if (!target) return;
@@ -118,6 +118,18 @@ export default function BoardNoticePage() {
 
         const ok = confirm("정말로 이 공지를 삭제할까요?");
         if (!ok) return;
+
+        const res = await fetch("/api/auth/boards/notice", {
+            method: "DELETE",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ id }),
+        });
+
+        if (!res.ok) {
+            const data = await res.json().catch(() => null);
+            alert(data?.message ?? "삭제에 실패했습니다.");
+            return;
+        }
 
         if (pinned) setPinnedNotices((prev) => prev.filter((x) => x.id !== id));
         else setNotices((prev) => prev.filter((x) => x.id !== id));

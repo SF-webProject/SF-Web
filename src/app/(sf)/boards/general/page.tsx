@@ -57,27 +57,27 @@ export default function BoardGeneralPage() {
     }, []);
 
     useEffect(() => {
-         if (!me?.ok) return;
-         if (me.user?.status !== "APPROVED") return;
+        if (!me?.ok) return;
+        if (me.user?.status !== "APPROVED") return;
 
-            (async () => {
-             const res = await fetch("/api/auth/boards/general", {
-             cache: "no-store",
-             });
+        (async () => {
+            const res = await fetch("/api/auth/boards/general", {
+                cache: "no-store",
+            });
 
-        if (!res.ok) {
-            console.error("게시글 불러오기 실패");
-             return;
+            if (!res.ok) {
+                console.error("게시글 불러오기 실패");
+                return;
             }
 
             const data = await res.json();
 
-         if (data.ok) {
-             setPosts(data.posts);
-             }
-             })();
-        }, [me]);
-        
+            if (data.ok) {
+                setPosts(data.posts);
+            }
+        })();
+    }, [me]);
+
 
     const user = me?.ok ? me.user : null;
     const isApproved = user?.status === "APPROVED";
@@ -129,13 +129,25 @@ export default function BoardGeneralPage() {
         );
     };
 
-    const onDelete = (id: number) => {
+    const onDelete = async (id: number) => {
         const target = posts.find((p) => p.id === id);
         if (!target) return;
         if (!canDelete(target)) return;
 
         const ok = confirm("정말로 이 글을 삭제할까요?");
         if (!ok) return;
+
+        const res = await fetch("/api/auth/boards/general", {
+            method: "DELETE",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ id }),
+        });
+
+        if (!res.ok) {
+            const data = await res.json().catch(() => null);
+            alert(data?.message ?? "삭제에 실패했습니다.");
+            return;
+        }
 
         setPosts((prev) => prev.filter((p) => p.id !== id));
     };
@@ -213,14 +225,14 @@ export default function BoardGeneralPage() {
                     </div>
                     <div className={styles.toolbarRight} id="write">
                         <button
-                         className={styles.btn}
-                        onClick={() => router.push("/boards/general/write")}
-                         disabled={!canWrite}
-                         style={!canWrite ? { opacity: 0.5, cursor: "not-allowed" } : undefined}
-                         type="button"
+                            className={styles.btn}
+                            onClick={() => router.push("/boards/general/write")}
+                            disabled={!canWrite}
+                            style={!canWrite ? { opacity: 0.5, cursor: "not-allowed" } : undefined}
+                            type="button"
                         >
                             <i className="fa-solid fa-pen-to-square" /> 글쓰기
-                         </button>
+                        </button>
                     </div>
 
 
