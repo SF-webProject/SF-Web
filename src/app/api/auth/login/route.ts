@@ -8,6 +8,7 @@ export async function POST(req: Request) {
   const formData = await req.formData();
   const email = String(formData.get("email") ?? "").trim();
   const password = String(formData.get("password") ?? "");
+  const remember = formData.get("remember") != null; // 체크되면 "on" 들어오고, 아니면 null
 
   if (!email || !password) {
     return NextResponse.json({ message: "모든 값을 입력해주세요" }, { status: 400 });
@@ -26,7 +27,9 @@ export async function POST(req: Request) {
   // 세션 토큰 발급 (쿠키에는 원문, DB에는 해시 저장)
   const token = crypto.randomBytes(32).toString("hex");
   const tokenHash = crypto.createHash("sha256").update(token).digest("hex");
-  const expiresAt = new Date(Date.now() + 1000 * 60 * 60 * 24 * 7); // 7일
+  const expiresAt = remember
+    ? new Date(Date.now() + 1000 * 60 * 60 * 24 * 7)  // 로그인 유지: 7일
+    : new Date(Date.now() + 1000 * 60 * 60 * 24 * 1); // 미유지: 서버기준 1일
 
   await prisma.session.create({
     data: {
@@ -37,12 +40,20 @@ export async function POST(req: Request) {
   });
 
   const res = NextResponse.redirect(new URL("/", req.url));
-  res.cookies.set("session", token, {
+  const baseCookie = {
     httpOnly: true,
-    sameSite: "lax",
+    sameSite: "lax" as const,
     secure: process.env.NODE_ENV === "production",
     path: "/",
-    expires: expiresAt,
-  });
+  };
+
+  if (remember) {
+    // 7일 유지(브라우저 닫아도 유지)
+    res.cookies.set("session", token, { ...baseCookie, expires: expiresAt });
+  } else {
+    // 브라우저 닫으면 삭제되는 세션 쿠키
+    res.cookies.set("session", token, baseCookie);
+  }
+  
   return res;
 }

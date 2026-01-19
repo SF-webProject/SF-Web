@@ -19,7 +19,7 @@ export async function getCurrentUser() {
 
     // 만료 처리
     if (session.expiresAt.getTime() < Date.now()) {
-        await prisma.session.delete({ where: { tokenHash } });
+        await prisma.session.deleteMany({ where: { tokenHash } });
         return null;
     }
 
