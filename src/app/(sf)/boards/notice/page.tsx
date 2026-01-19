@@ -31,6 +31,10 @@ export default function BoardNoticePage() {
     const [me, setMe] = useState<Me | null>(null);
     const [loadingMe, setLoadingMe] = useState(true);
     const [loadingPosts, setLoadingPosts] = useState(true);
+
+    // 공지 로딩 실패 메시지
+    const [postsError, setPostsError] = useState<string | null>(null);
+
     const [q, setQ] = useState("");
     const router = useRouter();
 
@@ -57,25 +61,39 @@ export default function BoardNoticePage() {
 
     useEffect(() => {
         if (me === null) return;
-        if (!me?.ok) {
+        const user = me.ok ? me.user : null;
+        if (!user || user.status !== "APPROVED") {
             setLoadingPosts(false);
+            setPostsError(null);
             return;
         }
+
+        setLoadingPosts(true);
+        setPostsError(null);
 
         (async () => {
             try {
                 const res = await fetch("/api/auth/boards/notice", { cache: "no-store", });
 
-                if (!res.ok) return;
+                if (!res.ok) {
+                    setPostsError("공지를 불러오지 못했습니다.");
+                    return;
+                }
 
                 const data = await res.json();
-                if (!data.ok) return;
+                if (!data.ok) {
+                    setPostsError(data?.message ?? "공지를 불러오지 못했습니다.");
+                    return;
+                }
 
                 const pinned = data.posts.filter((p: Notice) => p.pinned);
                 const normal = data.posts.filter((p: Notice) => !p.pinned);
 
                 setPinnedNotices(pinned);
                 setNotices(normal);
+            } catch (e) {
+                console.error(e);
+                setPostsError("공지를 불러오지 못했습니다.");
             } finally {
                 setLoadingPosts(false);
             }
@@ -84,6 +102,33 @@ export default function BoardNoticePage() {
 
 
     const user = me?.ok ? me.user : null;
+
+    const roleLabel = !user ? "비로그인" :
+        user.role === "ADMIN" ? "관리자" :
+        user.role === "STAFF" ? "운영진" :
+        "일반";
+
+    const isApproved = user?.status === "APPROVED";
+    const canWriteNotice = !!user && isApproved && (user.role === "ADMIN" || user.role === "STAFF");
+
+    const canDelete = (post: Notice) => {
+        if (!user || !isApproved) return false;
+        if (user.role === "ADMIN" || user.role === "STAFF") return true;
+        const myName = user.name ?? user.email;
+        return post.author === myName;
+    };
+
+    const qq = q.trim().toLowerCase();
+
+    const pinnedFiltered = useMemo(() => {
+        if (!qq) return pinnedNotices;
+        return pinnedNotices.filter((n) => (n.title + " " + n.content).toLowerCase().includes(qq));
+    }, [pinnedNotices, qq]);
+
+    const noticesFiltered = useMemo(() => {
+        if (!qq) return notices;
+        return notices.filter((n) => (n.title + " " + n.content).toLowerCase().includes(qq));
+    }, [notices, qq]);
 
     if (loadingMe) {
         return (
@@ -132,34 +177,17 @@ export default function BoardNoticePage() {
         );
     }
 
-    const roleLabel = useMemo(() => {
-        if (!user) return "비로그인";
-        if (user.role === "ADMIN") return "관리자";
-        if (user.role === "STAFF") return "운영진";
-        return "일반";
-    }, [user]);
-
-    const isApproved = user?.status === "APPROVED";
-    const canWriteNotice = !!user && isApproved && (user.role === "ADMIN" || user.role === "STAFF");
-
-    const canDelete = (post: Notice) => {
-        if (!user || !isApproved) return false;
-        if (user.role === "ADMIN" || user.role === "STAFF") return true;
-        const myName = user.name ?? user.email;
-        return post.author === myName;
-    };
-
-    const qq = q.trim().toLowerCase();
-
-    const pinnedFiltered = useMemo(() => {
-        if (!qq) return pinnedNotices;
-        return pinnedNotices.filter((n) => (n.title + " " + n.content).toLowerCase().includes(qq));
-    }, [pinnedNotices, qq]);
-
-    const noticesFiltered = useMemo(() => {
-        if (!qq) return notices;
-        return notices.filter((n) => (n.title + " " + n.content).toLowerCase().includes(qq));
-    }, [notices, qq]);
+    // 공지 불러오기 실패 UI
+    if (postsError) {
+        return (
+            <main className={styles.main}>
+                <div className={styles.pageTitle}>
+                    <h1 className={styles.pageTitleH1}>공지사항</h1>
+                    <p className={styles.pageTitleP}>{postsError}</p>
+                </div>
+            </main>
+        );
+    }
 
     const onDelete = async (id: number, pinned: boolean) => {
         const list = pinned ? pinnedNotices : notices;

@@ -29,6 +29,10 @@ type Post = {
 export default function BoardGeneralPage() {
     const [me, setMe] = useState<Me | null>(null);
     const [loadingMe, setLoadingMe] = useState(true);
+    const [loadingPosts, setLoadingPosts] = useState(true);
+
+    // 게시글 로딩 실패 메시지
+    const [postsError, setPostsError] = useState<string | null>(null);
 
     const [search, setSearch] = useState("");
     const [category, setCategory] = useState<"all" | Post["category"]>("all");
@@ -57,23 +61,43 @@ export default function BoardGeneralPage() {
     }, []);
 
     useEffect(() => {
-        if (!me?.ok) return;
-        if (me.user?.status !== "APPROVED") return;
+        if (me === null) return;
+        const user = me.ok ? me.user : null;
+        // 권한 없으면 posts 로딩 끝내고 종료
+        if (!user || user.status !== "APPROVED") {
+            setLoadingPosts(false);
+            setPostsError(null); // 권한 문제는 에러로 취급하지 않음
+            return;
+        }
+
+        setLoadingPosts(true); // fetch 시작 전 로딩 켜기
+        setPostsError(null); // 새 요청 시작 시 이전 에러 초기화
 
         (async () => {
-            const res = await fetch("/api/auth/boards/general", {
-                cache: "no-store",
-            });
+            try{
+                const res = await fetch("/api/auth/boards/general", {
+                    cache: "no-store",
+                });
 
-            if (!res.ok) {
-                console.error("게시글 불러오기 실패");
-                return;
-            }
+                if (!res.ok) {
+                    console.error("게시글 불러오기 실패");
+                    setPostsError("게시글을 불러오지 못했습니다.");
+                    return;
+                }
 
-            const data = await res.json();
+                const data = await res.json();
 
-            if (data.ok) {
-                setPosts(data.posts);
+                if (data.ok) {
+                    setPosts(data.posts);
+                } else{
+                    setPostsError(data?.message ?? "게시글을 불러오지 못했습니다.");
+                }
+            } catch (e) {
+                console.error(e);
+                setPostsError("게시글을 불러오지 못했습니다.");
+            } finally {
+                // 성공, 실패, return 여부 상관 없이 로딩 종료
+                setLoadingPosts(false);
             }
         })();
     }, [me]);
@@ -81,6 +105,36 @@ export default function BoardGeneralPage() {
 
     const user = me?.ok ? me.user : null;
     const isApproved = user?.status === "APPROVED";
+
+    const roleLabel = !user ? "비로그인" :
+        user.role === "ADMIN" ? "관리자" :
+        user.role === "STAFF" ? "운영진" :
+        "일반";
+
+    const canWrite = !!user && isApproved; // 부원은 공지 제외 글 작성 가능 = general은 허용
+    const canDelete = (post: Post) => {
+        if (!user || !isApproved) return false;
+        if (user.role === "ADMIN" || user.role === "STAFF") return true;
+        const myName = user.name ?? user.email;
+        return post.author === myName;
+    };
+
+    const filtered = useMemo(() => {
+        const q = search.trim().toLowerCase();
+
+        let arr = posts.filter((p) => {
+            if (category !== "all" && p.category !== category) return false;
+            if (!q) return true;
+            return (p.title + " " + p.content + " " + p.author).toLowerCase().includes(q);
+        });
+
+        arr = arr.slice().sort((a, b) => {
+            if (sort === "new") return b.date.localeCompare(a.date);
+            return a.date.localeCompare(b.date);
+        });
+
+        return arr;
+    }, [posts, search, category, sort]);
 
     // me 로딩 중에는 아무것도(또는 로딩 UI만) 렌더하지 않기
     if (loadingMe) {
@@ -119,37 +173,28 @@ export default function BoardGeneralPage() {
         );
     }
 
-    const roleLabel = useMemo(() => {
-        if (!user) return "비로그인";
-        if (user.role === "ADMIN") return "관리자";
-        if (user.role === "STAFF") return "운영진";
-        return "일반";
-    }, [user]);
+    if (loadingPosts) {
+        return (
+            <main className={styles.main}>
+                <div className={styles.pageTitle}>
+                    <h1 className={styles.pageTitleH1}>일반게시판</h1>
+                    <p className={styles.pageTitleP}>게시글 불러오는 중...</p>
+                </div>
+            </main>
+        );
+    }
 
-    const canWrite = !!user && isApproved; // 부원은 공지 제외 글 작성 가능 = general은 허용
-    const canDelete = (post: Post) => {
-        if (!user || !isApproved) return false;
-        if (user.role === "ADMIN" || user.role === "STAFF") return true;
-        const myName = user.name ?? user.email;
-        return post.author === myName;
-    };
-
-    const filtered = useMemo(() => {
-        const q = search.trim().toLowerCase();
-
-        let arr = posts.filter((p) => {
-            if (category !== "all" && p.category !== category) return false;
-            if (!q) return true;
-            return (p.title + " " + p.content + " " + p.author).toLowerCase().includes(q);
-        });
-
-        arr = arr.slice().sort((a, b) => {
-            if (sort === "new") return b.date.localeCompare(a.date);
-            return a.date.localeCompare(b.date);
-        });
-
-        return arr;
-    }, [posts, search, category, sort]);
+    // 게시글 불러오기 실패 UI
+    if (postsError) {
+        return (
+            <main className={styles.main}>
+                <div className={styles.pageTitle}>
+                    <h1 className={styles.pageTitleH1}>일반게시판</h1>
+                    <p className={styles.pageTitleP}>{postsError}</p>
+                </div>
+            </main>
+        );
+    }
 
     const tagForCategory = (cat: Post["category"]) => {
         if (cat === "기술 글") {

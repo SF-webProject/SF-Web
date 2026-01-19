@@ -58,6 +58,18 @@ export default function BoardResourcesPage() {
     const user = me?.ok ? me.user : null;
     const isApproved = user?.status === "APPROVED";
 
+    // 일단 자료 업로드는 운영진/관리자만 허용
+    const canUpload = !!user && isApproved && (user.role === "ADMIN" || user.role === "STAFF");
+
+    const filtered = useMemo(() => {
+        const q = search.trim().toLowerCase();
+        return resources.filter((r) => {
+            if (type !== "all" && r.type !== type) return false;
+            if (!q) return true;
+            return (r.name + " " + r.desc).toLowerCase().includes(q);
+        });
+    }, [resources, search, type]);
+
     // me 로딩 중에는 정상 화면을 렌더하지 않기
     if (loadingMe) {
         return (
@@ -93,18 +105,6 @@ export default function BoardResourcesPage() {
             </main>
         );
     }
-
-    // 일단 자료 업로드는 운영진/관리자만 허용
-    const canUpload = !!user && isApproved && (user.role === "ADMIN" || user.role === "STAFF");
-
-    const filtered = useMemo(() => {
-        const q = search.trim().toLowerCase();
-        return resources.filter((r) => {
-            if (type !== "all" && r.type !== type) return false;
-            if (!q) return true;
-            return (r.name + " " + r.desc).toLowerCase().includes(q);
-        });
-    }, [resources, search, type]);
 
     const iconByType = (t: ResourceType) => {
         if (t === "지원서") return "fa-file-signature";
