@@ -56,7 +56,11 @@ export default function BoardNoticePage() {
     }, []);
 
     useEffect(() => {
-        if (!me?.ok) return;
+        if (me === null) return;
+        if (!me?.ok) {
+            setLoadingPosts(false);
+            return;
+        }
 
         (async () => {
             try {
@@ -80,6 +84,53 @@ export default function BoardNoticePage() {
 
 
     const user = me?.ok ? me.user : null;
+
+    if (loadingMe) {
+        return (
+            <main className={styles.main}>
+                <div className={styles.pageTitle}>
+                    <h1 className={styles.pageTitleH1}>공지사항</h1>
+                    <p className={styles.pageTitleP}>권한 확인 중...</p>
+                </div>
+            </main>
+        );
+    }
+
+    if (!user) {
+        return (
+            <main className={styles.main}>
+                <div className={styles.pageTitle}>
+                    <h1 className={styles.pageTitleH1}>공지사항</h1>
+                    <p className={styles.pageTitleP}>이 페이지는 로그인 후 이용 가능합니다.</p>
+                </div>
+            </main>
+        );
+    }
+
+    if (user.status !== "APPROVED") {
+        return (
+            <main className={styles.main}>
+                <div className={styles.pageTitle}>
+                    <h1 className={styles.pageTitleH1}>공지사항</h1>
+                    <p className={styles.pageTitleP}>
+                        승인된 계정만 게시판을 열람할 수 있습니다. (현재: {user.status})
+                    </p>
+                </div>
+            </main>
+        );
+    }
+
+    // 승인된 유저만 여기 도달
+    if (loadingPosts) {
+        return (
+            <main className={styles.main}>
+                <div className={styles.pageTitle}>
+                    <h1 className={styles.pageTitleH1}>공지사항</h1>
+                    <p className={styles.pageTitleP}>게시글 불러오는 중...</p>
+                </div>
+            </main>
+        );
+    }
 
     const roleLabel = useMemo(() => {
         if (!user) return "비로그인";
@@ -134,29 +185,6 @@ export default function BoardNoticePage() {
         if (pinned) setPinnedNotices((prev) => prev.filter((x) => x.id !== id));
         else setNotices((prev) => prev.filter((x) => x.id !== id));
     };
-
-    if (!loadingMe) {
-        if (!user) {
-            return (
-                <main className={styles.main}>
-                    <div className={styles.pageTitle}>
-                        <h1 className={styles.pageTitleH1}>공지사항</h1>
-                        <p className={styles.pageTitleP}>이 페이지는 로그인 후 이용 가능합니다.</p>
-                    </div>
-                </main>
-            );
-        }
-        if (user.status !== "APPROVED") {
-            return (
-                <main className={styles.main}>
-                    <div className={styles.pageTitle}>
-                        <h1 className={styles.pageTitleH1}>공지사항</h1>
-                        <p className={styles.pageTitleP}>승인된 계정만 게시판을 열람할 수 있습니다. (현재: {user.status})</p>
-                    </div>
-                </main>
-            );
-        }
-    }
 
     return (
         <main className={styles.main}>
