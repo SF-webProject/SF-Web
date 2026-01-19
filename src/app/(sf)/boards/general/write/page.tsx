@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import styles from "../boards.module.css"; // 필요시 스타일
+import styles from "../../boards.module.css"; // 필요시 스타일
 
 export default function BoardWritePage() {
   const router = useRouter();

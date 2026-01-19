@@ -214,7 +214,7 @@ export default function BoardGeneralPage() {
                     <div className={styles.toolbarRight} id="write">
                         <button
                          className={styles.btn}
-                        onClick={() => router.push("/boards/write")}
+                        onClick={() => router.push("/boards/general/write")}
                          disabled={!canWrite}
                          style={!canWrite ? { opacity: 0.5, cursor: "not-allowed" } : undefined}
                          type="button"

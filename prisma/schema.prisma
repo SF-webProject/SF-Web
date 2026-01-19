@@ -77,6 +77,8 @@ model Post {
   title     String
   content   String
 
+  pinned    Boolean @default(false)
+
   authorId  String
   author    User     @relation(fields: [authorId], references: [id], onDelete: Cascade)
 
