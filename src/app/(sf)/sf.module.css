@@ -405,6 +405,9 @@ main.container {
   gap: 12px;
 }
 .aboutIntro__techItem{
+  display: flex;
+  align-items: center;      /* 세로(상하) 가운데 */
+  justify-content: center;  /* 가로(좌우) 가운데 */
   background: rgba(12,18,28,.60);
   border: 1px solid rgba(255,255,255,.10);
   border-radius: 14px;
@@ -871,6 +874,9 @@ main.container {
   gap: 12px;
 }
 .recruit__techTag{
+  display: flex;
+  align-items: center;      /* 세로(상하) 가운데 */
+  justify-content: center;  /* 가로(좌우) 가운데 */
   background: rgba(15,22,35,.8);
   border: 1px solid rgba(255,255,255,.10);
   border-radius: 12px;
