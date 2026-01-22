@@ -4,7 +4,7 @@
 import { useEffect, useMemo, useState } from "react";
 import styles from "../boards.module.css";
 import { useRouter } from "next/navigation";
-
+import Link from "next/link";
 
 type Me = {
     ok: boolean;
@@ -12,14 +12,14 @@ type Me = {
         id: string;
         email: string;
         name: string | null;
-        status: "PENDING" | "APPROVED" | "REJECTED" | null;
+        status: "PENDING" | "APPROVED" | null;
         role: "MEMBER" | "STAFF" | "ADMIN" | null;
     };
 };
 
 type Post = {
     id: number;
-    category: "기술 글" | "질문 글";
+    category: "기술 글" | "질문 글" | "기타";
     title: string;
     content: string;
     author: string;
@@ -196,6 +196,13 @@ export default function BoardGeneralPage() {
         );
     }
 
+    // 미리보기 함수
+    const previewText = (s: string, max = 80) => {
+        const oneLine = s.replace(/\s+/g, " ").trim();
+        if (oneLine.length <= max) return oneLine;
+        return oneLine.slice(0, max) + "…";
+    };
+
     const tagForCategory = (cat: Post["category"]) => {
         if (cat === "기술 글") {
             return (
@@ -312,10 +319,12 @@ export default function BoardGeneralPage() {
                             <tr key={p.id} className={styles.listRow}>
                                 <td className={styles.listBodyTd}>{tagForCategory(p.category)}</td>
                                 <td className={styles.listBodyTd}>
-                                    <a className={styles.titleLink} href="#">
+                                    <Link className={styles.titleLink} href={`/boards/general/${p.id}`}>
                                         {p.title}
-                                    </a>
-                                    <div className={styles.subtext}>{p.content}</div>
+                                    </Link>
+                                    <div className={`${styles.subtext} ${styles.subtextClamp}`}>
+                                        {previewText(p.content, 90)}
+                                    </div>
                                 </td>
                                 <td className={styles.listBodyTd}>{p.author}</td>
                                 <td className={styles.listBodyTd}>{p.date}</td>

@@ -122,7 +122,7 @@ export default function BoardsHomePage() {
         <div className={styles.sectionMeta}>삭제/관리 권한 안내</div>
       </div>
 
-      <div className={styles.boardWrap}>
+      <div className={styles.policyWrap}>
         <p className={styles.policyText}>
           • 본인 글: 본인이 수정/삭제 가능
           <br />
