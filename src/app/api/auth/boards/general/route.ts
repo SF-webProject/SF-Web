@@ -2,6 +2,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getCurrentUser } from "@/lib/auth";
+import autoDelete from "@/lib/hardDelete";
 
 type Post = {
   id: number;
@@ -27,8 +28,9 @@ export async function GET() {
     if (!["MEMBER", "STAFF", "ADMIN"].includes(user.role)) 
       return NextResponse.json({ ok: false, message: "게시판 접근 권한 없음" }, { status: 403 });
 
+    await autoDelete();
     const posts = await prisma.post.findMany({
-      where: { board: "GENERAL" },
+      where: { board: "GENERAL", deletedAt: null, },
       orderBy: { createdAt: "desc" },
       select: {
         id: true,
@@ -144,7 +146,10 @@ export async function DELETE(req: Request) {
       return NextResponse.json({ ok: false, message: "삭제 권한이 없습니다." }, { status: 403 });
     }
 
-    await prisma.post.delete({ where: { id: post.id } });
+    await prisma.post.update({
+      where: { id: post.id },
+      data: { deletedAt: new Date() },
+    });
 
     return NextResponse.json({ ok: true });
   } catch (err) {
