@@ -4,6 +4,7 @@
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import styles from "../../boards.module.css";
+import Comments from "../../_components/Comments";
 
 type Me = {
     ok: boolean;
@@ -151,6 +152,9 @@ export default function BoardGeneralDetailPage() {
                 <div style={{ whiteSpace: "pre-wrap", lineHeight: 1.7, color: "rgba(230,237,246,0.92)" }}>
                     {post.content}
                 </div>
+            </div>
+            <div className={styles.commentsSection}>
+                <Comments target="post" id={post.id} />
             </div>
 
             <div style={{ display: "flex", gap: 10, justifyContent: "center", marginTop: 18 }}>
