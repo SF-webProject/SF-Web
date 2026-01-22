@@ -4,6 +4,7 @@
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import styles from "../../boards.module.css";
+import Comments from "../../_components/Comments";
 
 type Me = {
   ok: boolean;
@@ -189,6 +190,9 @@ export default function ResourceDetailPage() {
             <br />
             크기: {formatBytes(resource.sizeBytes)}
           </div>
+        </div>
+        <div className={styles.commentsSection}>
+          <Comments target="resource" id={resource.id} />
         </div>
       </div>
     </main>

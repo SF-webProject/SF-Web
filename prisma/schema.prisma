@@ -53,6 +53,8 @@ model User {
   posts        Post[] 
   resources Resource[]
 
+  comments     Comment[]
+
   @@map("users")
 }
 
@@ -88,6 +90,8 @@ model Post {
 
   deletedAt DateTime?
 
+  comments     Comment[]
+
   @@index([board])
   @@index([category])
   @@index([createdAt])
@@ -112,9 +116,37 @@ model Resource {
   uploaderId   String
   uploader     User     @relation(fields: [uploaderId], references: [id], onDelete: Cascade)
 
+  comments     Comment[]
+
   @@index([type])
   @@index([createdAt])
   @@index([uploaderId])
 
   @@map("resources") // 테이블명 매핑
+}
+
+model Comment {
+  id        Int      @id @default(autoincrement())
+
+  content   String
+
+  // 댓글 대상 
+  postId     Int?
+  post       Post?     @relation(fields: [postId], references: [id], onDelete: Cascade)
+
+  resourceId Int?
+  resource   Resource? @relation(fields: [resourceId], references: [id], onDelete: Cascade)
+
+  authorId  String
+  author    User     @relation(fields: [authorId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  deletedAt DateTime?
+
+  @@index([postId, createdAt])
+  @@index([resourceId, createdAt])
+  @@index([authorId, createdAt])
+
+  @@map("comments")
 }
