@@ -1,3 +1,4 @@
+//src/app/(sf)/ctf/writeup/page.tsx
 import styles from "../../sf.module.css";
 
 export default function CtfWriteupPage() {
