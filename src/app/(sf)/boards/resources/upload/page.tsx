@@ -67,7 +67,7 @@ export default function ResourceUploadPage() {
             router.replace("/boards/resources");
             return;
         }
-    }, [loadingMe]); // 기존 스타일 유지(필요 시 user/canUpload/router 넣어도 되지만, 요청대로 최소 변경)
+    }, [loadingMe]);
 
     const onSubmit = async (e: React.FormEvent) => {
         e.preventDefault();

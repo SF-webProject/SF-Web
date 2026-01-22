@@ -18,7 +18,7 @@ type Me = {
 
 type Resource = {
   id: number;
-  type: string;      // ✅ 고정 enum이 아니라 string으로 (추가/확장 가능)
+  type: string;
   name: string;
   desc: string;
   sizeBytes: number; // DB에서 숫자(byte)로 오는 걸 가정
@@ -113,7 +113,7 @@ export default function BoardResourcesPage() {
   // 업로드는 운영진/관리자만
   const canUpload = !!user && isApproved && (user.role === "ADMIN" || user.role === "STAFF");
 
-  // ✅ type 옵션을 서버 데이터 기반으로 동적으로 만들기
+  // type 옵션을 서버 데이터 기반으로 동적으로 만들기
   const typeOptions = useMemo(() => {
     const set = new Set<string>();
     for (const r of resources) {
