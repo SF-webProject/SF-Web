@@ -154,9 +154,6 @@ function AuthHeaderInner() {
                         </Link>
                         <ul className={styles.dropdown}>
                             <li>
-                                <Link href="/ctf/awards">수상 실적</Link>
-                            </li>
-                            <li>
                                 <Link href="/ctf/writeup">Write-up</Link>
                             </li>
                         </ul>
