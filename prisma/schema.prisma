@@ -51,6 +51,7 @@ model User {
 
   sessions     Session[]
   posts        Post[] 
+  resources Resource[]
 
   @@map("users")
 }
@@ -90,4 +91,28 @@ model Post {
   @@index([createdAt])
 
   @@map("posts")
+}
+
+model Resource {
+  id           Int      @id @default(autoincrement())
+  type         String
+
+  title        String
+  description  String
+  originalName String
+  storedName   String
+  mimeType     String
+  sizeBytes    Int
+
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  uploaderId   String
+  uploader     User     @relation(fields: [uploaderId], references: [id], onDelete: Cascade)
+
+  @@index([type])
+  @@index([createdAt])
+  @@index([uploaderId])
+
+  @@map("resources") // 테이블명 매핑
 }

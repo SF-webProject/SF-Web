@@ -6,7 +6,7 @@ type MeUser = {
   id: string;
   email: string;
   name?: string | null;
-  status?: "PENDING" | "APPROVED" | "REJECTED" | null;
+  status?: "PENDING" | "APPROVED" | null;
   role?: "MEMBER" | "STAFF" | "ADMIN" | null;
 };
 

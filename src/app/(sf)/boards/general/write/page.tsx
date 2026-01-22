@@ -1,3 +1,4 @@
+//src/app/(sf)/boards/general/write/page.tsx
 "use client";
 
 import { useEffect, useState } from "react";
@@ -29,13 +30,13 @@ export default function BoardWritePage() {
 
         setLoadingAuth(false);
       } catch (err: unknown) {
-         if (err instanceof Error) {
-         alert(err.message);
-         } else {
-            alert("인증 오류");
-         }
-  router.replace("/login");
-}
+        if (err instanceof Error) {
+          alert(err.message);
+        } else {
+          alert("인증 오류");
+        }
+        router.replace("/login");
+      }
     })();
   }, [router]);
 

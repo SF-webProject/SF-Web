@@ -50,7 +50,7 @@ export async function GET() {
 
      const result: Notice[] = posts.map((p) => ({
       id: p.id,
-      type: p.category, 
+      type: "공지", 
       title: p.title,
       content: p.content,
       author: p.author.name ?? p.author.email,

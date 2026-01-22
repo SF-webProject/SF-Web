@@ -5,6 +5,7 @@
 import { useEffect, useMemo, useState } from "react";
 import styles from "../boards.module.css";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 type Me = {
     ok: boolean;
@@ -12,7 +13,7 @@ type Me = {
         id: string;
         email: string;
         name: string | null;
-        status: "PENDING" | "APPROVED" | "REJECTED" | null;
+        status: "PENDING" | "APPROVED" | null;
         role: "MEMBER" | "STAFF" | "ADMIN" | null;
     };
 };
@@ -189,6 +190,13 @@ export default function BoardNoticePage() {
         );
     }
 
+    // 미리보기 함수
+    const previewText = (s: string, max = 80) => {
+        const oneLine = s.replace(/\s+/g, " ").trim();
+        if (oneLine.length <= max) return oneLine;
+        return oneLine.slice(0, max) + "…";
+    };
+
     const onDelete = async (id: number, pinned: boolean) => {
         const list = pinned ? pinnedNotices : notices;
         const target = list.find((x) => x.id === id);
@@ -275,10 +283,12 @@ export default function BoardNoticePage() {
                                     </span>
                                 </td>
                                 <td className={styles.listBodyTd}>
-                                    <a className={styles.titleLink} href="#">
+                                    <Link className={styles.titleLink} href={`/boards/notice/${n.id}`}>
                                         {n.title}
-                                    </a>
-                                    <div className={styles.subtext}>{n.content}</div>
+                                    </Link>
+                                    <div className={`${styles.subtext} ${styles.subtextClamp}`}>
+                                        {previewText(n.content, 90)}
+                                    </div>
                                 </td>
                                 <td className={styles.listBodyTd}>{n.author}</td>
                                 <td className={styles.listBodyTd}>{n.date}</td>
@@ -333,10 +343,12 @@ export default function BoardNoticePage() {
                                     </span>
                                 </td>
                                 <td className={styles.listBodyTd}>
-                                    <a className={styles.titleLink} href="#">
+                                    <Link className={styles.titleLink} href={`/boards/notice/${n.id}`}>
                                         {n.title}
-                                    </a>
-                                    <div className={styles.subtext}>{n.content}</div>
+                                    </Link>
+                                    <div className={`${styles.subtext} ${styles.subtextClamp}`}>
+                                        {previewText(n.content, 90)}
+                                    </div>
                                 </td>
                                 <td className={styles.listBodyTd}>{n.author}</td>
                                 <td className={styles.listBodyTd}>{n.date}</td>

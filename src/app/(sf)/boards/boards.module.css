@@ -223,7 +223,7 @@
 }
 
 /* Policy box */
-.boardWrap {
+.policyWrap {
   background: rgba(12, 18, 28, 0.45);
   border: 1px solid rgba(255, 255, 255, 0.10);
   border-radius: 18px;
@@ -408,6 +408,14 @@
   color: rgba(154, 164, 178, 0.92);
   font-size: 0.90rem;
   line-height: 1.55;
+}
+
+.subtextClamp {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  line-clamp: 2;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
 }
 
 .actions {
