@@ -6,6 +6,11 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import styles from "../auth.module.css";
 
+type ApiResult = {
+    ok: boolean;
+    message?: string;
+};
+
 export default function RegisterPage() {
     const router = useRouter();
     const [error, setError] = useState<string | null>(null);
@@ -33,10 +38,10 @@ export default function RegisterPage() {
                             credentials: "include",
                         });
 
-                        const data = await r.json().catch(() => ({} as any));
+                        const data = (await r.json().catch(() => null)) as ApiResult | null;
 
-                        if (!r.ok || !data.ok) {
-                            setError(data.message ?? "회원가입에 실패했습니다.");
+                        if (!r.ok || !data?.ok) {
+                            setError(data?.message ?? "회원가입에 실패했습니다.");
                             return;
                         }
 

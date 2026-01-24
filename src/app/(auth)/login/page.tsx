@@ -5,6 +5,11 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import styles from "../auth.module.css";
 
+type ApiResult = {
+  ok: boolean;
+  message?: string;
+};
+
 export default function LoginPage() {
   const router = useRouter();
   const [error, setError] = useState<string | null>(null);
@@ -32,10 +37,10 @@ export default function LoginPage() {
               credentials: "include",
             });
 
-            const data = await r.json().catch(() => ({} as any));
+            const data = (await r.json().catch(() => null)) as ApiResult | null;
 
-            if (!r.ok || !data.ok) {
-              setError(data.message ?? "아이디나 비밀번호를 확인해주세요");
+            if (!r.ok || !data?.ok) {
+              setError(data?.message ?? "아이디나 비밀번호를 확인해주세요");
               return;
             }
 
