@@ -1,0 +1,152 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+enum AccountStatus {
+  PENDING
+  APPROVED
+}
+
+enum UserRole {
+  MEMBER
+  STAFF
+  ADMIN
+}
+
+enum BoardType {
+  NOTICE   // 공지사항
+  RESOURCE // 자료게시판
+  GENERAL  // 일반게시판
+}
+
+enum PostCategory {
+  TECH     // 기술 글
+  QNA      // 질문 글
+  NONE     // 공지/자료용
+}
+
+model User {
+  id           String    @id @default(cuid())
+  email        String    @unique
+  passwordHash String
+
+  name         String?
+  status       AccountStatus @default(PENDING)
+  role         UserRole      @default(MEMBER)
+  approvedAt   DateTime?
+
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  sessions     Session[]
+  posts        Post[] 
+  resources Resource[]
+
+  comments     Comment[]
+
+  @@map("users")
+}
+
+model Session {
+  id        String   @id @default(cuid())
+  tokenHash String   @unique
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@map("sessions")
+}
+
+model Post {
+  id        Int      @id @default(autoincrement())
+
+  board     BoardType
+  category  PostCategory
+
+  title     String
+  content   String
+
+  pinned    Boolean @default(false)
+
+  authorId  String
+  author    User     @relation(fields: [authorId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  deletedAt DateTime?
+
+  comments     Comment[]
+
+  @@index([board])
+  @@index([category])
+  @@index([createdAt])
+
+  @@map("posts")
+}
+
+model Resource {
+  id           Int      @id @default(autoincrement())
+  type         String
+
+  title        String
+  description  String
+  originalName String
+  storedName   String
+  mimeType     String
+  sizeBytes    Int
+
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  uploaderId   String
+  uploader     User     @relation(fields: [uploaderId], references: [id], onDelete: Cascade)
+
+  comments     Comment[]
+
+  @@index([type])
+  @@index([createdAt])
+  @@index([uploaderId])
+
+  @@map("resources") // 테이블명 매핑
+}
+
+model Comment {
+  id        Int      @id @default(autoincrement())
+
+  content   String
+
+  // 댓글 대상 
+  postId     Int?
+  post       Post?     @relation(fields: [postId], references: [id], onDelete: Cascade)
+
+  resourceId Int?
+  resource   Resource? @relation(fields: [resourceId], references: [id], onDelete: Cascade)
+
+  authorId  String
+  author    User     @relation(fields: [authorId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  deletedAt DateTime?
+
+  @@index([postId, createdAt])
+  @@index([resourceId, createdAt])
+  @@index([authorId, createdAt])
+
+  @@map("comments")
+}
