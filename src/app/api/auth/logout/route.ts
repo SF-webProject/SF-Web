@@ -18,6 +18,13 @@ export async function POST(req: Request) {
   }
 
   const res = NextResponse.redirect(new URL("/", req.url));
-  res.cookies.set("session", "", { path: "/", expires: new Date(0) });
+  const baseCookie = {
+    httpOnly: true,
+    sameSite: "lax" as const,
+    secure: process.env.NODE_ENV === "production",
+    path: "/",
+  };
+
+  res.cookies.set("session", "", { ...baseCookie, expires: new Date(0) });
   return res;
 }
