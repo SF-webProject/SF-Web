@@ -11,16 +11,16 @@ export async function POST(req: Request) {
   const passwordConfirm = String(formData.get("passwordConfirm") ?? "");
 
   if (!email || !password || !passwordConfirm) {
-    return NextResponse.json({ message: "모든 값을 입력해주세요" }, { status: 400 });
+    return NextResponse.json({ ok: false, message: "모든 값을 입력해주세요" }, { status: 400 });
   }
 
   if (password !== passwordConfirm) {
-    return NextResponse.json({ message: "비밀번호가 다릅니다" }, { status: 400 });
+    return NextResponse.json({ ok: false, message: "비밀번호가 다릅니다" }, { status: 400 });
   }
 
   const exists = await prisma.user.findUnique({ where: { email } });
   if (exists) {
-    return NextResponse.json({ message: "이미 존재하는 이메일입니다" }, { status: 409 });
+    return NextResponse.json({ ok: false, message: "이미 존재하는 이메일입니다" }, { status: 409 });
   }
 
   const passwordHash = await bcrypt.hash(password, 10);
@@ -33,6 +33,5 @@ export async function POST(req: Request) {
     },
   });
 
-  // POST 후에는 303으로 GET 전환
-  return NextResponse.redirect(new URL("/login", req.url), 303);
+  return NextResponse.json({ ok: true }, { status: 201 });
 }
