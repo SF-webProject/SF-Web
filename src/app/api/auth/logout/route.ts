@@ -17,7 +17,7 @@ export async function POST(req: Request) {
     await prisma.session.deleteMany({ where: { tokenHash } });
   }
 
-  const res = NextResponse.redirect(new URL("/", req.url));
+  const res = NextResponse.json({ ok: true });
   const baseCookie = {
     httpOnly: true,
     sameSite: "lax" as const,
