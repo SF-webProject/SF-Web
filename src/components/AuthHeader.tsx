@@ -207,20 +207,13 @@ function AuthHeaderInner() {
                         </button>
 
                         <div className={styles.userDropdown}>
-                            {/* 마이페이지는 나중에 구현 예정이면 href만 걸어두면 됩니다 */}
                             <Link href="/mypage" className={styles.userDropdownItem}>
                                 마이페이지
                             </Link>
 
-                            <form
-                                action="/api/auth/logout"
-                                method="post"
-                                className={styles.logoutForm}
-                            >
-                                <button type="submit" className={styles.userDropdownItem}>
-                                    로그아웃
-                                </button>
-                            </form>
+                            <Link href="/logout" className={styles.userDropdownItem}>
+                                로그아웃
+                            </Link>
                         </div>
                     </div>
                 ) : (

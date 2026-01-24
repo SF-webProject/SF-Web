@@ -13,7 +13,7 @@ export default function LogoutPage() {
       try {
         await fetch("/api/auth/logout", { method: "POST", credentials: "include" });
       } finally {
-        router.replace("/login");
+        router.replace("/");
         router.refresh();
       }
     })();
