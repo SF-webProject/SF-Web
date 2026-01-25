@@ -91,9 +91,9 @@ export default function LoginPage() {
               로그인 유지
             </label>
 
-            <a className={styles.link} href="#">
+            <Link className={styles.link} href="/forgot-password">
               비밀번호 찾기
-            </a>
+            </Link>
           </div>
 
           <button className={styles.btn} type="submit">

@@ -1,7 +1,7 @@
 //src/app/(sf)/boards/_components/Comments.tsx
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import styles from "../boards.module.css";
 
 type Me = {
@@ -74,7 +74,7 @@ export default function Comments(props: { target: "post" | "resource"; id: numbe
         })();
     }, []);
 
-    const load = async () => {
+    const load = useCallback(async () => {
         setLoading(true);
         setErr(null);
         try {
@@ -93,7 +93,7 @@ export default function Comments(props: { target: "post" | "resource"; id: numbe
         } finally {
             setLoading(false);
         }
-    };
+    }, [target, id]);
 
     useEffect(() => {
         if (me === null) return;
@@ -105,7 +105,7 @@ export default function Comments(props: { target: "post" | "resource"; id: numbe
             return;
         }
         load();
-    }, [me, target, id]);
+    }, [me, load]);
 
     const onSubmit = async () => {
         if (!canWrite) return;
