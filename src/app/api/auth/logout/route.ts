@@ -28,7 +28,3 @@ export async function POST(req: Request) {
   res.cookies.set("session", "", { ...baseCookie, expires: new Date(0) });
   return res;
 }
-
-export async function GET(req: Request) {
-  return NextResponse.redirect(new URL("/logout", req.url));
-}

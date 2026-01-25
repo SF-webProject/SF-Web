@@ -14,6 +14,10 @@ export async function POST(req: Request) {
     return NextResponse.json({ ok: false, message: "모든 값을 입력해주세요" }, { status: 400 });
   }
 
+  if (password.length < 8) {
+    return NextResponse.json({ ok: false, message: "비밀번호는 8자 이상이어야 합니다" }, { status: 400 });
+  }
+  
   if (password !== passwordConfirm) {
     return NextResponse.json({ ok: false, message: "비밀번호가 다릅니다" }, { status: 400 });
   }

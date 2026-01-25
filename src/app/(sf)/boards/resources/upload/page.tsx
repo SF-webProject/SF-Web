@@ -16,8 +16,6 @@ type Me = {
     };
 };
 
-type ResourceType = string;
-
 export default function ResourceUploadPage() {
     const router = useRouter();
 
@@ -52,6 +50,10 @@ export default function ResourceUploadPage() {
 
     useEffect(() => {
         if (loadingMe) return;
+
+        // me가 아직 null일 수도 있으니 안전 처리 추가
+        if (!me) return;
+
         if (!user) {
             alert("로그인이 필요합니다.");
             router.replace("/login");
@@ -67,7 +69,7 @@ export default function ResourceUploadPage() {
             router.replace("/boards/resources");
             return;
         }
-    }, [loadingMe]);
+    }, [loadingMe, me, user, canUpload, router]);
 
     const onSubmit = async (e: React.FormEvent) => {
         e.preventDefault();

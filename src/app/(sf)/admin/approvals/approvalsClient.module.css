@@ -1,0 +1,110 @@
+/* src/app/(sf)/admin/approvals/approvalsClient.module.css */
+.wrap {
+    display: grid;
+    gap: 12px;
+}
+
+.list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 10px;
+}
+
+.item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+
+    border: 1px solid rgba(255, 255, 255, .08);
+    background: rgba(12, 18, 28, .55);
+    border-radius: 14px;
+    padding: 14px 14px;
+
+    transition: transform .18s ease, border-color .18s ease, box-shadow .18s ease, background .18s ease;
+}
+
+.item:hover {
+    transform: translateY(-2px);
+    background: rgba(255, 255, 255, .03);
+    border-color: rgba(45, 212, 191, .30);
+    box-shadow: 0 0 0 8px rgba(45, 212, 191, .05);
+}
+
+.left {
+    min-width: 0;
+    display: grid;
+    gap: 4px;
+}
+
+.name {
+    font-weight: 1000;
+    color: rgba(230, 237, 246, .93);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.email {
+    color: rgba(154, 164, 178, .92);
+    font-weight: 800;
+    font-size: .92rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.button {
+    flex: 0 0 auto;
+    padding: 10px 14px;
+    border-radius: 999px;
+    border: 1px solid rgba(255, 255, 255, .12);
+    background: rgba(255, 255, 255, .02);
+    color: rgba(230, 237, 246, .90);
+    font-weight: 1000;
+    cursor: pointer;
+    transition: transform .18s ease, border-color .18s ease, box-shadow .18s ease, background .18s ease;
+}
+
+.button:hover {
+    transform: translateY(-1px);
+    border-color: rgba(45, 212, 191, .55);
+    box-shadow: 0 0 0 8px rgba(45, 212, 191, .08);
+    background: rgba(255, 255, 255, .04);
+}
+
+.button:disabled {
+    opacity: .55;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
+.empty {
+    color: rgba(154, 164, 178, .90);
+    font-weight: 900;
+    padding: 6px 2px;
+}
+
+.msg {
+    color: rgba(154, 164, 178, .95);
+    font-weight: 900;
+    padding: 4px 2px;
+}
+
+.actions {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.dangerButton {
+    border-color: rgba(255, 90, 95, .28);
+}
+
+.dangerButton:hover {
+    border-color: rgba(255, 90, 95, .55);
+    box-shadow: 0 0 0 8px rgba(255, 90, 95, .08);
+}
