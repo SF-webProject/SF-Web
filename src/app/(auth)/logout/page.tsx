@@ -11,9 +11,9 @@ export default function LogoutPage() {
   useEffect(() => {
     (async () => {
       try {
-        await fetch("/api/auth/logout", { method: "POST" });
+        await fetch("/api/auth/logout", { method: "POST", credentials: "include" });
       } finally {
-        router.replace("/login");
+        router.replace("/");
         router.refresh();
       }
     })();

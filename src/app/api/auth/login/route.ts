@@ -11,17 +11,17 @@ export async function POST(req: Request) {
   const remember = formData.get("remember") != null; // 체크되면 "on" 들어오고, 아니면 null
 
   if (!email || !password) {
-    return NextResponse.json({ message: "모든 값을 입력해주세요" }, { status: 400 });
+    return NextResponse.json({ ok: false, message: "모든 값을 입력해주세요" }, { status: 400 });
   }
 
   const user = await prisma.user.findUnique({ where: { email } });
   if (!user) {
-    return NextResponse.json({ message: "아이디나 비밀번호를 확인해주세요" }, { status: 401 });
+    return NextResponse.json({ ok: false, message: "아이디나 비밀번호를 확인해주세요" }, { status: 401 });
   }
 
   const ok = await bcrypt.compare(password, user.passwordHash);
   if (!ok) {
-    return NextResponse.json({ message: "아이디나 비밀번호를 확인해주세요" }, { status: 401 });
+    return NextResponse.json({ ok: false, message: "아이디나 비밀번호를 확인해주세요" }, { status: 401 });
   }
 
   // 세션 토큰 발급 (쿠키에는 원문, DB에는 해시 저장)
@@ -39,7 +39,8 @@ export async function POST(req: Request) {
     },
   });
 
-  const res = NextResponse.redirect(new URL("/", req.url));
+  // 성공 시 redirect 말고 json 응답 + set-cookie
+  const res = NextResponse.json({ ok: true });
   const baseCookie = {
     httpOnly: true,
     sameSite: "lax" as const,

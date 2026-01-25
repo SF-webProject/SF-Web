@@ -2,9 +2,19 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
 import styles from "../auth.module.css";
 
+type ApiResult = {
+    ok: boolean;
+    message?: string;
+};
+
 export default function RegisterPage() {
+    const router = useRouter();
+    const [error, setError] = useState<string | null>(null);
+
     return (
         <div className={styles.signupWrap}>
             <div className={styles.signupCard}>
@@ -13,7 +23,43 @@ export default function RegisterPage() {
                     <p>SecurityFACT 계정을 생성하세요</p>
                 </div>
 
-                <form action="/api/auth/register" method="post" className={styles.form}>
+                <form
+                    className={styles.form}
+                    onSubmit={async (e) => {
+                        e.preventDefault();
+                        setError(null);
+
+                        const form = e.currentTarget;
+                        const formData = new FormData(form);
+
+                        const r = await fetch("/api/auth/register", {
+                            method: "POST",
+                            body: formData,
+                            credentials: "include",
+                        });
+
+                        const data = (await r.json().catch(() => null)) as ApiResult | null;
+
+                        if (!r.ok || !data?.ok) {
+                            setError(data?.message ?? "회원가입에 실패했습니다.");
+                            return;
+                        }
+
+                        router.replace("/login");
+                    }}
+                >
+                    {error && (
+                        <p
+                            style={{
+                                margin: "0 26px 12px",
+                                color: "rgba(255,90,95,.95)",
+                                fontWeight: 800,
+                            }}
+                        >
+                            {error}
+                        </p>
+                    )}
+
                     <div className={styles.field}>
                         <label htmlFor="name">NAME</label>
                         <input
@@ -68,7 +114,8 @@ export default function RegisterPage() {
                 </form>
 
                 <p className={styles.hint}>
-                    가입 신청 후 관리자의 승인을 거쳐<br />
+                    가입 신청 후 관리자의 승인을 거쳐
+                    <br />
                     정식 회원으로 활동이 가능합니다.
                 </p>
 

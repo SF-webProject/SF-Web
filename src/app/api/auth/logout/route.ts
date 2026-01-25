@@ -17,7 +17,18 @@ export async function POST(req: Request) {
     await prisma.session.deleteMany({ where: { tokenHash } });
   }
 
-  const res = NextResponse.redirect(new URL("/", req.url));
-  res.cookies.set("session", "", { path: "/", expires: new Date(0) });
+  const res = NextResponse.json({ ok: true });
+  const baseCookie = {
+    httpOnly: true,
+    sameSite: "lax" as const,
+    secure: process.env.NODE_ENV === "production",
+    path: "/",
+  };
+
+  res.cookies.set("session", "", { ...baseCookie, expires: new Date(0) });
   return res;
+}
+
+export async function GET(req: Request) {
+  return NextResponse.redirect(new URL("/logout", req.url));
 }
