@@ -1,0 +1,47 @@
+//src/app/api/auth/admin/approve/route.ts
+import { NextResponse } from "next/server";
+import { getCurrentUser } from "@/lib/auth";
+import { prisma } from "@/lib/prisma";
+
+export async function POST(req: Request) {
+    try {
+        const me = await getCurrentUser();
+        if (!me) {
+            return NextResponse.json({ ok: false, message: "로그인이 필요합니다." }, { status: 401 });
+        }
+        if (me.status !== "APPROVED" || me.role !== "ADMIN") {
+            return NextResponse.json({ ok: false, message: "접근 권한이 없습니다." }, { status: 403 });
+        }
+
+        const body = await req.json().catch(() => ({}));
+        const userId = typeof body.userId === "string" ? body.userId : "";
+
+        if (!userId) {
+            return NextResponse.json({ ok: false, message: "userId가 필요합니다." }, { status: 400 });
+        }
+
+        // 이미 APPROVED면 그대로 ok 처리(멱등)
+        const target = await prisma.user.findUnique({
+            where: { id: userId },
+            select: { id: true, status: true },
+        });
+
+        if (!target) {
+            return NextResponse.json({ ok: false, message: "사용자를 찾을 수 없습니다." }, { status: 404 });
+        }
+
+        if (target.status !== "PENDING") {
+            return NextResponse.json({ ok: true });
+        }
+
+        await prisma.user.update({
+            where: { id: userId },
+            data: { status: "APPROVED", approvedAt: new Date() },
+        });
+
+        return NextResponse.json({ ok: true });
+    } catch (err) {
+        console.error(err);
+        return NextResponse.json({ ok: false, message: "서버 오류" }, { status: 500 });
+    }
+}

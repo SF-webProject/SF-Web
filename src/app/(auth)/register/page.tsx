@@ -93,6 +93,7 @@ export default function RegisterPage() {
                             type="password"
                             placeholder="비밀번호"
                             required
+                            minLength={8}
                         />
                     </div>
 
@@ -105,6 +106,7 @@ export default function RegisterPage() {
                             type="password"
                             placeholder="비밀번호 확인"
                             required
+                            minLength={8}
                         />
                     </div>
 

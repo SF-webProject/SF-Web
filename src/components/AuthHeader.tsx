@@ -2,7 +2,7 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import styles from "./AuthHeader.module.css";
 import Image from "next/image";
@@ -210,6 +210,16 @@ function AuthHeaderInner() {
                             <Link href="/mypage" className={styles.userDropdownItem}>
                                 마이페이지
                             </Link>
+
+                            <Link href="/mypage/profile" className={styles.userDropdownItem}>
+                                프로필 수정
+                            </Link>
+
+                            {me.role === "ADMIN" && (
+                                <Link href="/admin/approvals" className={styles.userDropdownItem}>
+                                    가입 승인
+                                </Link>
+                            )}
 
                             <Link href="/logout" className={styles.userDropdownItem}>
                                 로그아웃
