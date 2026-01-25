@@ -23,8 +23,17 @@ export default function ProfileEditClient(props: {
         setLoading(true);
 
         try {
-            const payload: any = {};
+            type ProfilePatchPayload = {
+                name?: string;
+                currentPassword?: string;
+                newPassword?: string;
+                newPasswordConfirm?: string;
+            };
+
+            const payload: ProfilePatchPayload = {};
+
             if (mode === "name") payload.name = name;
+
             if (mode === "password") {
                 payload.currentPassword = currentPassword;
                 payload.newPassword = newPassword;

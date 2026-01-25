@@ -6,7 +6,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { getCurrentUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import type { BoardType, PostCategory, UserRole, AccountStatus } from "@prisma/client";
+import type { BoardType, PostCategory } from "@prisma/client";
 
 function boardText(board: BoardType) {
     if (board === "NOTICE") return "공지사항";

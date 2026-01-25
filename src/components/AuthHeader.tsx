@@ -46,6 +46,32 @@ function AuthHeaderInner() {
     const [openKey, setOpenKey] = useState<string | null>(null);
     const [me, setMe] = useState<MeUser | null>(null);
 
+    const router = useRouter();
+    const [isLoggingOut, setIsLoggingOut] = useState(false);
+
+    const onLogout = async () => {
+        if (isLoggingOut) return;
+        setIsLoggingOut(true);
+
+        try {
+            await fetch("/api/auth/logout", {
+                method: "POST",
+                credentials: "include",
+                cache: "no-store",
+            });
+        } finally {
+            // UI를 즉시 로그아웃 상태로 반영
+            setMe(null);
+            setOpenKey(null);
+
+            // 홈으로 보내고, 서버컴포넌트도 갱신
+            router.replace("/");
+            router.refresh();
+
+            setIsLoggingOut(false);
+        }
+    };
+
     const toggleDropdown =
         (key: string, _href: string) => (e: React.MouseEvent) => {
             void _href; // lint unused 방지
@@ -221,9 +247,14 @@ function AuthHeaderInner() {
                                 </Link>
                             )}
 
-                            <Link href="/logout" className={styles.userDropdownItem}>
-                                로그아웃
-                            </Link>
+                            <button
+                                type="button"
+                                className={styles.userDropdownItem}
+                                onClick={onLogout}
+                                disabled={isLoggingOut}
+                            >
+                                {isLoggingOut ? "로그아웃 중..." : "로그아웃"}
+                            </button>
                         </div>
                     </div>
                 ) : (
